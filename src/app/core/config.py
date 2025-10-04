@@ -3,7 +3,7 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from .singleton import SingletonMeta
+from .singleton import ResettableSingletonMeta
 
 
 class Settings(BaseSettings):
@@ -22,13 +22,19 @@ class Settings(BaseSettings):
     secret_key: str = "change-me"
     access_token_expire_minutes: int = 60
     allowed_hosts: list[str] = ["*"]
+    subscription_pricing: dict[str, float] = {
+        "free": 0.0,
+        "premium": 12.0,
+        "coach": 29.0,
+    }
+    subscription_currency: str = "USD"
 
     @cached_property
     def base_path(self) -> Path:
         return Path(__file__).resolve().parents[3]
 
 
-class SettingsSingleton(metaclass=SingletonMeta):
+class SettingsSingleton(metaclass=ResettableSingletonMeta):
     def __init__(self) -> None:
         self._settings = Settings()
 

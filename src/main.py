@@ -5,7 +5,17 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
-from app.api.v1.routes import accounts, health, events, federations
+from app.api.v1.routes import (
+    accounts,
+    athletes,
+    events,
+    federations,
+    health,
+    news,
+    rosters,
+    search,
+    subscriptions,
+)
 from app.core.config import SettingsSingleton
 from app.core.database import init_models
 
@@ -40,7 +50,12 @@ def create_app() -> FastAPI:
 
     application.include_router(health.router, prefix=settings.api_v1_prefix)
     application.include_router(accounts.router, prefix=settings.api_v1_prefix)
+    application.include_router(subscriptions.router, prefix=settings.api_v1_prefix)
+    application.include_router(athletes.router, prefix=settings.api_v1_prefix)
     application.include_router(events.router, prefix=settings.api_v1_prefix)
+    application.include_router(rosters.router, prefix=settings.api_v1_prefix)
+    application.include_router(news.router, prefix=settings.api_v1_prefix)
+    application.include_router(search.router, prefix=settings.api_v1_prefix)
     application.include_router(federations.router, prefix=settings.api_v1_prefix)
 
     @application.on_event("startup")

@@ -6,10 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from app.models import Base
 
 from .config import SettingsSingleton
-from .singleton import SingletonMeta
+from .singleton import ResettableSingletonMeta, SingletonMeta
 
 
-class DatabaseSessionManager(metaclass=SingletonMeta):
+class DatabaseSessionManager(metaclass=ResettableSingletonMeta):
     def __init__(self) -> None:
         settings = SettingsSingleton().instance
 
