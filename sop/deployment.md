@@ -22,9 +22,9 @@ This SOP outlines how to deploy the FastAPI service onto a free-tier platform. I
 1. Create a free account at [Neon](https://console.neon.tech/).
 2. Provision a Postgres database and note the connection string.
 3. Update Railway environment variable `ATHLETICS_DATABASE_URL` with the Neon connection string (use `postgresql+psycopg_async://` driver, install `psycopg[binary]`).
-4. Run migrations/initialization:
+4. Run migrations/initialization (Railway shells need `PYTHONPATH=src` to resolve the `app.*` modules):
    ```bash
-   railway run "python -c 'import asyncio; from app.core.database import init_models; asyncio.run(init_models())'"
+   railway run "PYTHONPATH=src python -c 'import asyncio; from app.core.database import init_models; asyncio.run(init_models())'"
    ```
 
 ## 4. Continuous Deployment

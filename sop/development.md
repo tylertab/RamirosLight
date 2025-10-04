@@ -9,9 +9,9 @@
 1. Clone the repository and create a Python virtual environment.
 2. Install dependencies via `pip install -r requirements.txt`.
 3. Copy `.env.example` to `.env` (or create `.env`) if you need to override defaults.
-4. Initialize the database:
+4. Initialize the database (the repository uses a `src/` layout, so ensure `PYTHONPATH=src` is set):
    ```bash
-   python -c "import asyncio; from app.core.database import init_models; asyncio.run(init_models())"
+   PYTHONPATH=src python -c "import asyncio; from app.core.database import init_models; asyncio.run(init_models())"
    ```
 
 ## 3. Running Services Locally
