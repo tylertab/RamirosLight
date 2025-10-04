@@ -1270,6 +1270,9 @@ if (pageId === "home") {
     if (Array.isArray(initialHomeData.news) && initialHomeData.news.length) {
       state.news = initialHomeData.news;
     }
+    renderAthletes();
+    renderEvents();
+    renderSearchResults();
   }
 
   function renderAthletes() {
@@ -1558,6 +1561,8 @@ if (pageId === "home") {
   }
 
   function renderStaticSections() {
+    renderAthletes();
+    renderEvents();
     renderRosters();
     renderNews();
     renderSearchResults();
