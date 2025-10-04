@@ -1,14 +1,25 @@
 from fastapi import APIRouter, Depends
 
-from fastapi import APIRouter, Depends
-
 from app.core.authorization import require_feature
 from app.domain import SubscriptionFeature
-from app.schemas.athlete import AthleteHistoryResponse, AthleteProfileRead, AthleteProfileUpdate
+from app.schemas.athlete import (
+    AthleteDetail,
+    AthleteHistoryResponse,
+    AthleteProfileRead,
+    AthleteProfileUpdate,
+)
 from app.schemas.user import UserRead
 from app.services.athletes import AthletesService, get_athletes_service
 
 router = APIRouter(prefix="/athletes", tags=["athletes"])
+
+
+@router.get("/{athlete_id}", response_model=AthleteDetail)
+async def read_detail(
+    athlete_id: int,
+    service: AthletesService = Depends(get_athletes_service),
+) -> AthleteDetail:
+    return await service.get_detail(athlete_id)
 
 
 @router.get("/{athlete_id}/history", response_model=AthleteHistoryResponse)

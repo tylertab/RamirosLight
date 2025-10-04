@@ -1,7 +1,8 @@
 from collections.abc import AsyncGenerator
 from pathlib import Path
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import sqlalchemy as sa
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 
 from app.models import Base
 
@@ -29,6 +30,34 @@ class DatabaseSessionManager(metaclass=ResettableSingletonMeta):
         return self._session_factory()
 
 
+class DatabaseSchemaManager:
+    def __init__(self, engine: AsyncEngine | None = None) -> None:
+        self._engine = engine or DatabaseSessionManager().engine
+
+    async def ensure_schema(self) -> None:
+        async with self._engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+            await conn.run_sync(self._ensure_user_subscription_columns)
+
+    def _ensure_user_subscription_columns(self, sync_conn) -> None:
+        if sync_conn.dialect.name != "sqlite":
+            return
+        inspector = sa.inspect(sync_conn)
+        if "users" not in inspector.get_table_names():
+            return
+        existing_columns = {column["name"] for column in inspector.get_columns("users")}
+        required_columns = {
+            "subscription_tier": "TEXT NOT NULL DEFAULT 'FREE'",
+            "subscription_expires_at": "TIMESTAMP",
+            "subscription_started_at": "TIMESTAMP",
+            "subscription_renewal_period_days": "INTEGER NOT NULL DEFAULT 30",
+            "last_payment_reference": "VARCHAR(120)",
+        }
+        for column_name, ddl in required_columns.items():
+            if column_name not in existing_columns:
+                sync_conn.execute(sa.text(f"ALTER TABLE users ADD COLUMN {column_name} {ddl}"))
+
+
 async def init_models() -> None:
     settings = SettingsSingleton().instance
     if settings.database_url.startswith("sqlite"):
@@ -36,8 +65,7 @@ async def init_models() -> None:
         db_path = settings.database_url.split("///")[-1]
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
-    async with DatabaseSessionManager().engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+    await DatabaseSchemaManager().ensure_schema()
 
 
 async def get_session() -> AsyncGenerator[AsyncSession, None]:

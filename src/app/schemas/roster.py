@@ -1,6 +1,11 @@
+from __future__ import annotations
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
+
+from app.schemas.athlete import AthleteSummary
+from app.schemas.user import UserRead
 
 
 class RosterBase(BaseModel):
@@ -21,3 +26,8 @@ class RosterRead(RosterBase):
 
     class Config:
         from_attributes = True
+
+
+class RosterDetail(RosterRead):
+    owner: UserRead | None = None
+    athletes: list[AthleteSummary] = Field(default_factory=list)

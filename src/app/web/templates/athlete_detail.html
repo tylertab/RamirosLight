@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Athlete profile – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero" id="athlete-detail" data-athlete-id="{{ athlete_id }}">
+    <div>
+      <h1 id="athlete-name">Loading athlete…</h1>
+      <p id="athlete-subtitle" class="panel-subtitle"></p>
+    </div>
+    <div class="page-actions">
+      <a id="athlete-email" class="ghost" href="#">Email athlete</a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Biography</h2>
+        <p class="panel-subtitle">Background and highlights curated by Trackeo.</p>
+      </div>
+    </div>
+    <div id="athlete-bio">This athlete has not published a biography yet.</div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Competition history</h2>
+        <p class="panel-subtitle">Recent performances across the Americas.</p>
+      </div>
+    </div>
+    <ul id="athlete-history" class="timeline"></ul>
+    <div id="athlete-history-empty" class="empty-state" hidden>
+      <p>No competition history is available yet.</p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Teams &amp; rosters</h2>
+        <p class="panel-subtitle">Federation rosters linked to this athlete.</p>
+      </div>
+    </div>
+    <ul id="athlete-rosters" class="card-list"></ul>
+    <div id="athlete-rosters-empty" class="empty-state" hidden>
+      <p>This athlete has not been assigned to a roster.</p>
+    </div>
+  </section>
+{% endblock %}

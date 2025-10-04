@@ -804,7 +804,10 @@ const sampleNews = [
 const state = {
   athletes: [],
   events: [],
-  rosters: sampleRosters.slice(),
+  rosters: sampleRosters.map((roster, index) => ({
+    id: index + 1,
+    ...roster,
+  })),
   news: sampleNews.slice(),
   federationToken: null,
 };
@@ -865,13 +868,17 @@ if (pageId === "home") {
       const item = document.createElement("li");
       item.className = "card";
       const created = athlete.created_at ? new Date(athlete.created_at) : new Date();
+      const profileId = athlete.id ?? athlete.user_id ?? null;
+      const nameMarkup = profileId
+        ? `<a href="/athletes/${profileId}">${athlete.full_name}</a>`
+        : athlete.full_name;
       item.innerHTML = `
         <div class="card-meta">
           <span class="tag">${athlete.role}</span>
           <span>${athlete.email}</span>
           <span>${formatDate(created)}</span>
         </div>
-        <h3>${athlete.full_name}</h3>
+        <h3>${nameMarkup}</h3>
       `;
       athleteList.appendChild(item);
     });
@@ -917,6 +924,10 @@ if (pageId === "home") {
     rostersEmpty.hidden = true;
     state.rosters.forEach((roster) => {
       const updated = roster.updated_at ? formatDate(roster.updated_at) : "";
+      const rosterId = roster.id ?? null;
+      const titleMarkup = rosterId ? `<a href="/rosters/${rosterId}">${roster.name}</a>` : roster.name;
+      const totalAthletes = roster.athlete_count ?? roster.athletes ?? "--";
+      const coachName = roster.coach_name ?? roster.coach ?? "TBA";
       const item = document.createElement("li");
       item.className = "card";
       item.innerHTML = `
@@ -925,8 +936,8 @@ if (pageId === "home") {
           <span>${roster.division}</span>
           ${updated ? `<span>Updated ${updated}</span>` : ""}
         </div>
-        <h3>${roster.name}</h3>
-        <p>${roster.athletes} athletes · Coach ${roster.coach}</p>
+        <h3>${titleMarkup}</h3>
+        <p>${totalAthletes} athletes · Coach ${coachName}</p>
       `;
       rostersList.appendChild(item);
     });
@@ -972,11 +983,13 @@ if (pageId === "home") {
         );
       });
       athletes.forEach((athlete) => {
+        const profileId = athlete.id ?? athlete.user_id ?? null;
         results.push({
           category: "Athletes",
           title: athlete.full_name,
           subtitle: athlete.email,
           detail: athlete.role,
+          url: profileId ? `/athletes/${profileId}` : undefined,
         });
       });
     }
@@ -1011,11 +1024,15 @@ if (pageId === "home") {
         );
       });
       rosters.forEach((roster) => {
+        const rosterId = roster.id ?? null;
+        const totalAthletes = roster.athlete_count ?? roster.athletes ?? "--";
+        const coachName = roster.coach_name ?? roster.coach ?? "TBA";
         results.push({
           category: "Rosters",
           title: roster.name,
-          subtitle: `${roster.country} · ${roster.division}`,
-          detail: `${roster.athletes} athletes • Coach ${roster.coach}`,
+          subtitle: `${roster.country} · ${roster.division ?? ""}`,
+          detail: `${totalAthletes} athletes • Coach ${coachName}`,
+          url: rosterId ? `/rosters/${rosterId}` : undefined,
         });
       });
     }
@@ -1065,12 +1082,13 @@ if (pageId === "home") {
     results.forEach((result) => {
       const item = document.createElement("li");
       item.className = "search-result";
+      const titleMarkup = result.url ? `<a href="${result.url}">${result.title}</a>` : result.title;
       item.innerHTML = `
         <div class="search-result-header">
           <span class="tag">${result.category}</span>
           ${result.subtitle ? `<span>${result.subtitle}</span>` : ""}
         </div>
-        <h3>${result.title}</h3>
+        <h3>${titleMarkup}</h3>
         ${result.description ? `<p>${result.description}</p>` : result.detail ? `<p>${result.detail}</p>` : ""}
       `;
       searchResults.appendChild(item);
@@ -1085,6 +1103,7 @@ if (pageId === "home") {
       renderSearchResults();
     } catch (error) {
       const fallback = sampleAthletes.map((athlete, index) => ({
+        id: index + 1,
         ...athlete,
         created_at: new Date(Date.now() - index * 86400000).toISOString(),
       }));
@@ -1292,13 +1311,14 @@ if (pageId === "profiles") {
       const item = document.createElement("li");
       item.className = "card";
       const created = formatDate(profile.created_at);
+      const nameMarkup = profile.id ? `<a href="/athletes/${profile.id}">${profile.full_name}</a>` : profile.full_name;
       item.innerHTML = `
         <div class="card-meta">
           <span class="tag">${profile.role}</span>
           <span>${profile.email}</span>
           ${created ? `<span>${created}</span>` : ""}
         </div>
-        <h3>${profile.full_name}</h3>
+        <h3>${nameMarkup}</h3>
       `;
       list.appendChild(item);
     });
@@ -1444,6 +1464,10 @@ if (pageId === "rosters") {
     empty.hidden = true;
     filtered.forEach((roster) => {
       const updated = roster.updated_at ? formatDate(roster.updated_at) : "";
+      const rosterId = roster.id ?? null;
+      const totalAthletes = roster.athlete_count ?? roster.athletes ?? "--";
+      const coachName = roster.coach_name ?? roster.coach ?? "TBA";
+      const titleMarkup = rosterId ? `<a href="/rosters/${rosterId}">${roster.name}</a>` : roster.name;
       const item = document.createElement("li");
       item.className = "card";
       item.innerHTML = `
@@ -1452,8 +1476,8 @@ if (pageId === "rosters") {
           <span>${roster.division || ""}</span>
           ${updated ? `<span>${updated}</span>` : ""}
         </div>
-        <h3>${roster.name}</h3>
-        <p>${roster.athletes ?? "--"} athletes · Coach ${roster.coach || "TBA"}</p>
+        <h3>${titleMarkup}</h3>
+        <p>${totalAthletes} athletes · Coach ${coachName}</p>
       `;
       list.appendChild(item);
     });
@@ -1464,7 +1488,8 @@ if (pageId === "rosters") {
       rosters = await request("/rosters/");
       renderRostersPage();
     } catch (error) {
-      rosters = sampleRosters.map((roster) => ({
+      rosters = sampleRosters.map((roster, index) => ({
+        id: index + 1,
         ...roster,
         updated_at: roster.updated_at || new Date().toISOString(),
       }));
@@ -1483,6 +1508,191 @@ if (pageId === "rosters") {
   }
 
   loadRostersPage();
+}
+if (pageId === "athlete-detail") {
+  const hero = document.querySelector("#athlete-detail");
+  const nameEl = document.querySelector("#athlete-name");
+  const subtitleEl = document.querySelector("#athlete-subtitle");
+  const emailLink = document.querySelector("#athlete-email");
+  const bioContainer = document.querySelector("#athlete-bio");
+  const historyList = document.querySelector("#athlete-history");
+  const historyEmpty = document.querySelector("#athlete-history-empty");
+  const rostersList = document.querySelector("#athlete-rosters");
+  const rostersEmpty = document.querySelector("#athlete-rosters-empty");
+
+  if (hero) {
+    const athleteId = hero.dataset.athleteId;
+
+    async function loadAthleteDetail() {
+      if (!athleteId) {
+        return;
+      }
+      try {
+        const detail = await request(`/athletes/${athleteId}`);
+        if (nameEl) {
+          nameEl.textContent = detail.full_name;
+        }
+        if (subtitleEl) {
+          const joined = [detail.role, detail.subscription_tier ? `${detail.subscription_tier} member` : null]
+            .filter(Boolean)
+            .join(" · ");
+          subtitleEl.textContent = joined;
+        }
+        if (emailLink) {
+          emailLink.href = `mailto:${detail.email}`;
+          emailLink.textContent = detail.email;
+        }
+        if (bioContainer) {
+          bioContainer.innerHTML = "";
+          if (detail.bio) {
+            const paragraph = document.createElement("p");
+            paragraph.textContent = detail.bio;
+            bioContainer.appendChild(paragraph);
+          } else {
+            bioContainer.textContent = "This athlete has not published a biography yet.";
+          }
+          if (detail.highlight_video_url) {
+            const highlight = document.createElement("p");
+            const link = document.createElement("a");
+            link.href = detail.highlight_video_url;
+            link.target = "_blank";
+            link.rel = "noopener";
+            link.textContent = "Watch highlight video";
+            highlight.appendChild(link);
+            bioContainer.appendChild(highlight);
+          }
+        }
+
+        if (historyList && historyEmpty) {
+          historyList.innerHTML = "";
+          const entries = detail.track_history ?? [];
+          if (!entries.length) {
+            historyEmpty.hidden = false;
+          } else {
+            historyEmpty.hidden = true;
+            entries.forEach((entry) => {
+              const item = document.createElement("li");
+              const eventDate = entry.event_date ? formatDate(entry.event_date) : "";
+              item.innerHTML = `
+                <strong>${entry.event}</strong>
+                ${eventDate ? `<span>${eventDate}</span>` : ""}
+                <span>${entry.result}</span>
+                ${entry.video_url ? `<a href="${entry.video_url}" target="_blank" rel="noopener">Watch race</a>` : ""}
+              `;
+              historyList.appendChild(item);
+            });
+          }
+        }
+
+        if (rostersList && rostersEmpty) {
+          rostersList.innerHTML = "";
+          const rosters = detail.rosters ?? [];
+          if (!rosters.length) {
+            rostersEmpty.hidden = false;
+          } else {
+            rostersEmpty.hidden = true;
+            rosters.forEach((roster) => {
+              const item = document.createElement("li");
+              item.className = "card";
+              const updated = roster.updated_at ? formatDate(roster.updated_at) : "";
+              item.innerHTML = `
+                <div class="card-meta">
+                  <span class="tag">${roster.country}</span>
+                  <span>${roster.division}</span>
+                  ${updated ? `<span>${updated}</span>` : ""}
+                </div>
+                <h3><a href="/rosters/${roster.id}">${roster.name}</a></h3>
+                <p>${roster.athlete_count} athletes · Coach ${roster.coach_name}</p>
+              `;
+              rostersList.appendChild(item);
+            });
+          }
+        }
+      } catch (error) {
+        notify("error", `Unable to load athlete (${error.message}).`);
+        console.error(error);
+      }
+    }
+
+    loadAthleteDetail();
+  }
+}
+if (pageId === "roster-detail") {
+  const hero = document.querySelector("#roster-detail");
+  const nameEl = document.querySelector("#roster-name");
+  const subtitleEl = document.querySelector("#roster-subtitle");
+  const ownerLink = document.querySelector("#roster-owner");
+  const divisionEl = document.querySelector("#roster-division");
+  const coachEl = document.querySelector("#roster-coach");
+  const updatedEl = document.querySelector("#roster-updated");
+  const athletesList = document.querySelector("#roster-athletes");
+  const athletesEmpty = document.querySelector("#roster-athletes-empty");
+
+  if (hero) {
+    const rosterId = hero.dataset.rosterId;
+
+    async function loadRosterDetail() {
+      if (!rosterId) {
+        return;
+      }
+      try {
+        const detail = await request(`/rosters/${rosterId}`);
+        if (nameEl) {
+          nameEl.textContent = detail.name;
+        }
+        if (subtitleEl) {
+          const segments = [detail.country, detail.division, `${detail.athlete_count} athletes`].filter(Boolean);
+          subtitleEl.textContent = segments.join(" · ");
+        }
+        if (divisionEl) {
+          divisionEl.textContent = detail.division || "—";
+        }
+        if (coachEl) {
+          coachEl.textContent = detail.coach_name || "TBA";
+        }
+        if (updatedEl) {
+          updatedEl.textContent = detail.updated_at ? formatDate(detail.updated_at) : "—";
+        }
+        if (ownerLink) {
+          if (detail.owner) {
+            ownerLink.textContent = `${detail.owner.full_name} (${detail.owner.email})`;
+            ownerLink.href = detail.owner.email ? `mailto:${detail.owner.email}` : "#";
+          } else {
+            ownerLink.textContent = "No owner assigned";
+            ownerLink.href = "/rosters";
+          }
+        }
+
+        if (athletesList && athletesEmpty) {
+          athletesList.innerHTML = "";
+          const athletes = detail.athletes ?? [];
+          if (!athletes.length) {
+            athletesEmpty.hidden = false;
+          } else {
+            athletesEmpty.hidden = true;
+            athletes.forEach((athlete) => {
+              const item = document.createElement("li");
+              item.className = "card";
+              item.innerHTML = `
+                <div class="card-meta">
+                  <span class="tag">Athlete</span>
+                  <span>${athlete.email}</span>
+                </div>
+                <h3><a href="/athletes/${athlete.id}">${athlete.full_name}</a></h3>
+                ${athlete.bio ? `<p>${athlete.bio}</p>` : ""}
+              `;
+              athletesList.appendChild(item);
+            });
+          }
+        }
+      } catch (error) {
+        notify("error", `Unable to load roster (${error.message}).`);
+        console.error(error);
+      }
+    }
+
+    loadRosterDetail();
+  }
 }
 const TOKEN_STORAGE_KEY = "trackeo.auth.token";
 const TOKEN_EXPIRY_KEY = "trackeo.auth.expires";
