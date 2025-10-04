@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}About – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div>
+      <h1 data-l10n-key="about.title">About Trackeo</h1>
+      <p data-l10n-key="about.subtitle">Built in Atlanta and powered by federations across Latin America.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="about-mission-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="about-mission-title" data-l10n-key="about.mission_title">Mission</h2>
+        <p class="panel-subtitle" data-l10n-key="about.mission_subtitle">We amplify athletes with trusted data, multilingual coverage, and equitable access.</p>
+      </div>
+    </div>
+    <div class="copy-grid">
+      <p data-l10n-key="about.mission_body_1">Trackeo centralizes competition data for 19 federations while delivering insights in English, Spanish, and Portuguese.</p>
+      <p data-l10n-key="about.mission_body_2">Our platform supports coaches with workload analytics, empowers fans with contextual storytelling, and streamlines compliance for federation staff.</p>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="about-team-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="about-team-title" data-l10n-key="about.team_title">Team &amp; partners</h2>
+        <p class="panel-subtitle" data-l10n-key="about.team_subtitle">Trackeo collaborates with local statisticians, journalists, and federations throughout the region.</p>
+      </div>
+    </div>
+    <ul class="card-list about-list">
+      <li class="card">
+        <h3 data-l10n-key="about.team_item_1_title">Atlanta HQ</h3>
+        <p data-l10n-key="about.team_item_1_body">Product, engineering, and partnerships operate from Atlanta, coordinating multilingual coverage.</p>
+      </li>
+      <li class="card">
+        <h3 data-l10n-key="about.team_item_2_title">Regional bureaus</h3>
+        <p data-l10n-key="about.team_item_2_body">Embedded correspondents in Bogotá, São Paulo, Santiago, and Mexico City file news and verify results.</p>
+      </li>
+      <li class="card">
+        <h3 data-l10n-key="about.team_item_3_title">Federation council</h3>
+        <p data-l10n-key="about.team_item_3_body">An advisory council of federation leaders ensures Trackeo meets security and accessibility standards.</p>
+      </li>
+    </ul>
+  </section>
+{% endblock %}

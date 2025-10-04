@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Profiles – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div>
+      <h1 data-l10n-key="profiles.title">Athlete &amp; staff profiles</h1>
+      <p data-l10n-key="profiles.subtitle">Search federated accounts with verified event history and multilingual bios.</p>
+    </div>
+    <div class="page-actions">
+      <button class="primary" type="button" id="profiles-refresh" data-l10n-key="profiles.refresh">Refresh profiles</button>
+      <button class="ghost" type="button" id="profiles-create" data-l10n-key="profiles.create">Create new profile</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="profiles-list-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="profiles-list-title" data-l10n-key="profiles.list_title">Directory</h2>
+        <p class="panel-subtitle" data-l10n-key="profiles.list_subtitle">Live data from the Trackeo accounts service.</p>
+      </div>
+      <input
+        id="profiles-filter"
+        class="inline-search"
+        type="search"
+        placeholder="Filter by name or email"
+        data-l10n-placeholder="profiles.filter_placeholder"
+        aria-label="Filter profiles"
+        data-l10n-aria-label="profiles.filter_aria"
+      />
+    </div>
+
+    <div id="profiles-empty" class="empty-state" hidden>
+      <p data-l10n-key="profiles.empty">No profiles were found.</p>
+      <p class="hint" data-l10n-key="profiles.hint">Adjust your filters or create a new account from the sign-up view.</p>
+    </div>
+
+    <ul id="profiles-list" class="card-list" aria-live="polite"></ul>
+  </section>
+{% endblock %}
