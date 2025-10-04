@@ -94,6 +94,18 @@ def create_app() -> FastAPI:
             fallback_markup="<h1>Events</h1>",
         )
 
+    @application.get("/events/{event_id}", response_class=HTMLResponse)
+    async def render_event_detail(
+        request: Request, event_id: int
+    ) -> HTMLResponse:
+        return _template_response(
+            request,
+            "event_detail.html",
+            page_id="event-detail",
+            fallback_markup=f"<h1>Event #{event_id}</h1>",
+            context={"event_id": event_id},
+        )
+
     @application.get("/rosters", response_class=HTMLResponse)
     async def render_rosters_page(request: Request) -> HTMLResponse:
         return _template_response(

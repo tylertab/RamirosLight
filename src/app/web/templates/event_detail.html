@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Event Detail – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero" id="event-detail" data-event-id="{{ event_id }}">
+    <div>
+      <p class="eyebrow" data-l10n-key="event_detail.eyebrow">Live meet operations</p>
+      <h1 id="event-detail-name">—</h1>
+      <p id="event-detail-meta" class="hero-subtitle">—</p>
+    </div>
+    <div class="page-actions">
+      <button class="ghost" type="button" id="event-refresh" data-l10n-key="event_detail.refresh">Refresh</button>
+      <button class="primary" type="button" id="event-generate-demo" data-l10n-key="event_detail.generate_demo">Generate demo timeline</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="event-overview-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="event-overview-title" data-l10n-key="event_detail.overview_title">Event overview</h2>
+        <p class="panel-subtitle" data-l10n-key="event_detail.overview_subtitle">Track status, federation ownership, and last update.</p>
+      </div>
+      <div class="panel-controls">
+        <span class="tag" id="event-latest-update" aria-live="polite">—</span>
+      </div>
+    </div>
+    <dl class="event-summary" id="event-summary">
+      <div>
+        <dt data-l10n-key="event_detail.summary_location">Location</dt>
+        <dd id="event-summary-location">—</dd>
+      </div>
+      <div>
+        <dt data-l10n-key="event_detail.summary_dates">Dates</dt>
+        <dd id="event-summary-dates">—</dd>
+      </div>
+      <div>
+        <dt data-l10n-key="event_detail.summary_federation">Federation</dt>
+        <dd id="event-summary-federation">—</dd>
+      </div>
+      <div>
+        <dt data-l10n-key="event_detail.summary_status">Live status</dt>
+        <dd id="event-summary-status">—</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="panel" aria-labelledby="event-schedule-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="event-schedule-title" data-l10n-key="event_detail.schedule_title">Sessions &amp; timetable</h2>
+        <p class="panel-subtitle" data-l10n-key="event_detail.schedule_subtitle">Monitor blocks of competition and venues.</p>
+      </div>
+    </div>
+    <div id="event-sessions-empty" class="empty-state" hidden>
+      <p data-l10n-key="event_detail.schedule_empty">No sessions have been scheduled yet.</p>
+      <p class="hint" data-l10n-key="event_detail.schedule_hint">Create a session above or generate demo data to populate the timeline.</p>
+    </div>
+    <ul class="session-list" id="event-session-list"></ul>
+  </section>
+
+  <section class="panel" aria-labelledby="event-disciplines-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="event-disciplines-title" data-l10n-key="event_detail.disciplines_title">Events &amp; scoreboards</h2>
+        <p class="panel-subtitle" data-l10n-key="event_detail.disciplines_subtitle">Heat sheets update instantly for track-side ops.</p>
+      </div>
+    </div>
+    <div id="event-disciplines-empty" class="empty-state" hidden>
+      <p data-l10n-key="event_detail.disciplines_empty">No disciplines are attached to this meet yet.</p>
+      <p class="hint" data-l10n-key="event_detail.disciplines_hint">Generate demo data or use the API to seed events.</p>
+    </div>
+    <div id="event-discipline-container" class="discipline-groups" aria-live="polite"></div>
+  </section>
+{% endblock %}
