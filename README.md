@@ -9,6 +9,10 @@ A modular FastAPI backend that powers a South America-wide athletics portal. The
 - Federation ingestion pipeline stub backed by an in-process queue.
 - Comprehensive SOPs covering development, deployment, data ingestion, and operations.
 
+## Prerequisites
+- Python 3.11 or 3.12 (3.13 is not yet supported because of upstream dependency constraints.)
+- Git
+
 ## Getting Started
 1. **Install dependencies**
    ```bash
