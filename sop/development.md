@@ -1,7 +1,7 @@
 # Development SOP
 
 ## 1. Prerequisites
-- Python 3.11+
+- Python 3.11 or 3.12 (we currently cap at <3.13 until dependencies add support)
 - Git
 - (Optional) SQLite CLI for inspecting the local database.
 
