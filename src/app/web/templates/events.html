@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Events – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div>
+      <h1 data-l10n-key="events.title">Competition calendar</h1>
+      <p data-l10n-key="events.subtitle">Monitor official meets created by federations and Trackeo partners.</p>
+    </div>
+    <div class="page-actions">
+      <button class="primary" type="button" id="events-create" data-l10n-key="events.create">Schedule event</button>
+      <button class="ghost" type="button" id="events-refresh" data-l10n-key="events.refresh">Refresh</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="events-calendar-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="events-calendar-title" data-l10n-key="events.list_title">Upcoming &amp; recent meets</h2>
+        <p class="panel-subtitle" data-l10n-key="events.list_subtitle">Data is sourced from the events service and updates instantly.</p>
+      </div>
+      <div class="panel-controls">
+        <label class="checkbox">
+          <input type="checkbox" id="events-only-upcoming" />
+          <span data-l10n-key="events.filter_upcoming">Show only upcoming</span>
+        </label>
+      </div>
+    </div>
+
+    <div id="events-page-empty" class="empty-state" hidden>
+      <p data-l10n-key="events.empty">No events are published yet.</p>
+      <p class="hint" data-l10n-key="events.hint">Create a meet or ask your federation to upload an official calendar.</p>
+    </div>
+
+    <ul id="events-page-list" class="card-list" aria-live="polite"></ul>
+  </section>
+{% endblock %}

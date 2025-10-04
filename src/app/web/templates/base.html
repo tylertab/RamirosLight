@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Trackeo – Latin American Athletics Intelligence{% endblock %}</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body data-page="{{ page_id | default('home') }}">
+    <header class="site-header">
+      <div class="brand">
+        <a class="logo" href="/">Trackeo</a>
+        <span class="badge" data-l10n-key="badge.beta">Beta</span>
+      </div>
+      <nav class="header-nav" aria-label="Primary">
+        <a class="nav-link" href="/" data-l10n-key="nav.home">Home</a>
+        <a class="nav-link" href="/profiles" data-l10n-key="nav.profiles">Profiles</a>
+        <a class="nav-link" href="/events" data-l10n-key="nav.events">Events</a>
+        <a class="nav-link" href="/rosters" data-l10n-key="nav.rosters">Rosters</a>
+        <a class="nav-link" href="/federations/upload" data-l10n-key="nav.federations">Federations</a>
+        <a class="nav-link" href="/about" data-l10n-key="nav.about">About</a>
+      </nav>
+      <div class="header-actions">
+        <label class="locale-picker">
+          <span class="sr-only" data-l10n-key="locale.label">Choose language</span>
+          <select id="locale-switcher">
+            <option value="en">EN · English</option>
+            <option value="es">ES · Español</option>
+            <option value="pt">PT · Português</option>
+          </select>
+        </label>
+        <button class="ghost" type="button" id="header-login" data-l10n-key="action.login">Log in</button>
+        <button class="primary" type="button" id="header-signup" data-l10n-key="action.signup">Create account</button>
+      </div>
+    </header>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <aside id="notifications" class="notifications" role="status" aria-live="assertive"></aside>
+
+    <footer class="app-footer">
+      <p>
+        <span data-l10n-key="footer.powered">Trackeo · Powered by FastAPI · API base:</span>
+        <code id="api-base">/api/v1</code>
+      </p>
+      <p data-l10n-key="footer.location">Headquartered in Atlanta, GA · Scaling across South America with localized partners.</p>
+    </footer>
+
+    <script src="/static/app.js" type="module"></script>
+  </body>
+</html>

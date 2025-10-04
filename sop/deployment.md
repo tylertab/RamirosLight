@@ -14,7 +14,7 @@ This SOP outlines how to deploy the FastAPI service onto a free-tier platform. I
 4. On the service setup page, specify:
    - **Build Command:** `pip install -r requirements.txt`
    - **Start Command:** `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
-   - **Environment:** Python 3.11 (set via Railway's Nixpacks or add `railway.toml`).
+   - **Environment:** Python 3.11 (set via Railway's Nixpacks or add `railway.toml`). Static assets are served directly from `src/app/web/static`, so no additional build steps are required.
 5. Add environment variables from `.env.example` under the project settings.
 6. Deploy and monitor build logs.
 
@@ -33,7 +33,8 @@ This SOP outlines how to deploy the FastAPI service onto a free-tier platform. I
 
 ## 5. Post-Deployment Verification
 - Hit `/api/v1/health` to verify readiness.
-- Create a test user using `/api/v1/accounts/register`.
+- Load `https://<railway-app>.up.railway.app/` to confirm templates render, navigation links work, and the locale switcher persists selections.
+- Create a test user using `/api/v1/accounts/register` or via the `/signup` page; ensure the login view issues tokens that allow `/federations/upload` submissions.
 - Confirm database entries via Neon dashboard.
 
 ## 6. Rollback Procedure

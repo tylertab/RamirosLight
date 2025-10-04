@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Federation upload – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div>
+      <h1 data-l10n-key="federations.title">Secure federation uploads</h1>
+      <p data-l10n-key="federations.subtitle">Submit encrypted result bundles with audit trails and automated verification.</p>
+    </div>
+    <div class="page-actions">
+      <button class="ghost" type="button" id="federations-refresh" data-l10n-key="federations.refresh">Refresh submissions</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="federations-upload-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="federations-upload-title" data-l10n-key="federations.form_title">Upload official files</h2>
+        <p class="panel-subtitle" data-l10n-key="federations.form_subtitle">Provide a signed storage link. Trackeo validates checksum and processes asynchronously.</p>
+      </div>
+    </div>
+
+    <form id="federations-upload-form" class="form vertical secure" autocomplete="off">
+      <label>
+        <span data-l10n-key="federations.token">Access token</span>
+        <input type="password" name="token" placeholder="Bearer token" required data-l10n-placeholder="federations.token_placeholder" />
+      </label>
+      <label>
+        <span data-l10n-key="federations.name">Federation name</span>
+        <input type="text" name="federation_name" placeholder="Confederación Sudamericana" required data-l10n-placeholder="federations.name_placeholder" />
+      </label>
+      <label>
+        <span data-l10n-key="form.email">Email</span>
+        <input type="email" name="contact_email" placeholder="contact@federation.org" required data-l10n-placeholder="federations.email_placeholder" />
+      </label>
+      <label>
+        <span data-l10n-key="federations.payload">Secure payload URL</span>
+        <input type="url" name="payload_url" placeholder="https://storage.example.com/results.json" required data-l10n-placeholder="federations.payload_placeholder" />
+      </label>
+      <label>
+        <span data-l10n-key="federations.notes">Notes (optional)</span>
+        <textarea name="notes" rows="3" data-l10n-placeholder="federations.notes_placeholder" placeholder="Describe the event or include validation hints"></textarea>
+      </label>
+      <button type="submit" class="primary" data-l10n-key="federations.submit">Submit for processing</button>
+    </form>
+  </section>
+
+  <section class="panel" aria-labelledby="federations-submissions-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="federations-submissions-title" data-l10n-key="federations.submissions_title">Submission history</h2>
+        <p class="panel-subtitle" data-l10n-key="federations.submissions_subtitle">Track processing, checksum validation, and verification status.</p>
+      </div>
+    </div>
+
+    <div id="federations-submissions-empty" class="empty-state" hidden>
+      <p data-l10n-key="federations.submissions_empty">No submissions yet. Upload your first official file to begin.</p>
+    </div>
+
+    <ul id="federations-submissions" class="card-list" aria-live="polite"></ul>
+  </section>
+{% endblock %}

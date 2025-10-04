@@ -3,10 +3,12 @@
 A modular FastAPI backend that powers a South America-wide athletics portal. The project favors free-tier friendly services, singleton-managed infrastructure, and clear standard operating procedures (SOPs) to make onboarding simple.
 
 ## Features
-- Async FastAPI API with versioned routers for accounts, events, federations, and health checks.
+- Async FastAPI API with versioned routers for accounts, events, federations, search, subscriptions, and health checks.
+- Server-rendered multi-page web portal (home, profiles, events, rosters, federations upload, auth, about) served from `src/app/web/templates` with a shared base layout.
+- Locale-aware front-end powered by `static/app.js`, featuring an English, Spanish, and Portuguese translation dictionary, navigation actions, and authenticated federation upload workflows.
 - SQLAlchemy ORM models with SQLite (dev) and Postgres-ready configuration for free cloud databases.
-- Singleton-based configuration, database session factory, password hashing, and message bus.
-- Federation ingestion pipeline stub backed by an in-process queue.
+- Singleton-based configuration, database session factory, password hashing, and message bus used across services.
+- Federation ingestion pipeline stub backed by an in-process queue with secure upload management through the web experience.
 - Comprehensive SOPs covering development, deployment, data ingestion, and operations.
 
 ## Prerequisites
@@ -14,7 +16,7 @@ A modular FastAPI backend that powers a South America-wide athletics portal. The
 - Git
 
 ## Getting Started
-1. **Run the quick setup script** – automates virtualenv creation, dependency installation, `.env` generation, and database bootstrapping. Override defaults with `PYTHON_BIN`, `VENV_PATH`, or `REQUIREMENTS_FILE` as needed.
+1. **Run the quick setup script** – automates virtualenv creation, dependency installation, `.env` generation, static asset linking, and database bootstrapping. Override defaults with `PYTHON_BIN`, `VENV_PATH`, or `REQUIREMENTS_FILE` as needed.
    ```bash
    ./scripts/dev_setup.sh
    ```
@@ -23,11 +25,12 @@ A modular FastAPI backend that powers a South America-wide athletics portal. The
    source .venv/bin/activate
    export PYTHONPATH=$(pwd)/src
    ```
-3. **Run the API**
+3. **Run the API + web portal**
    ```bash
    uvicorn src.main:app --reload
    ```
-4. **Explore the docs** – visit `http://localhost:8000/docs` for interactive OpenAPI docs.
+4. **Explore the web portal** – visit `http://localhost:8000/` for the localized multi-page UI (language selector is located in the footer and persists per session).
+5. **Review the API docs** – visit `http://localhost:8000/docs` for interactive OpenAPI documentation.
 
 ## Environment Variables
 Configure via `.env` (all optional defaults provided):
@@ -42,7 +45,13 @@ Configure via `.env` (all optional defaults provided):
 | `ATHLETICS_ALLOWED_HOSTS` | Comma-separated hosts | `*` |
 
 ## Tests
-Tests are not yet implemented. Suggested next steps include adding pytest-based API and service tests and wiring them into CI.
+Run the full suite with:
+
+```bash
+pytest
+```
+
+The tests exercise authentication, subscription upgrades, content search, and federation ingestion flows to ensure the web interactions backed by the API remain stable.
 
 ## Documentation & SOPs
 - [Architecture](docs/architecture.md)

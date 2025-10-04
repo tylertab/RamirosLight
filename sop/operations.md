@@ -2,14 +2,15 @@
 
 ## 1. Daily Checks
 - Review uptime dashboard (Better Stack or UptimeRobot) for incidents.
+- Perform a spot check of the public portal (home ➜ profiles ➜ events ➜ federations upload) to ensure templates load and locale switching works.
 - Scan Railway logs for errors or elevated response times.
-- Confirm federation submissions processed in the last 24 hours; follow up on failures.
+- Confirm federation submissions processed in the last 24 hours; follow up on failures. Use the `/federations/upload` view with a service token to verify new submissions appear.
 
 ## 2. Incident Response
-1. **Triage**: Determine scope (API down, ingestion stalled, auth failures).
+1. **Triage**: Determine scope (API down, ingestion stalled, auth failures, portal navigation broken, localization issues).
 2. **Mitigation**: Roll back via Railway deployment history or disable problematic feature flag.
 3. **Communication**: Notify stakeholders via email/Slack with status and ETA.
-4. **Resolution**: Implement fix, deploy, and verify using `/api/v1/health` and regression tests.
+4. **Resolution**: Implement fix, deploy, and verify using `/api/v1/health`, `/federations/upload`, and regression tests.
 5. **Postmortem**: Document cause, remediation, and action items in shared Notion/Google Doc within 48 hours.
 
 ## 3. Backup & Recovery
