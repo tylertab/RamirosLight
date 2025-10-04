@@ -113,6 +113,49 @@ const translations = {
     "home.events_submit": "Create event",
     "home.events_empty": "No events have been scheduled yet.",
     "home.events_hint": "Use the meet form or reload the curated calendar of sample events.",
+    "event_detail.eyebrow": "Live meet operations",
+    "event_detail.refresh": "Refresh",
+    "event_detail.generate_demo": "Generate demo timeline",
+    "event_detail.overview_title": "Event overview",
+    "event_detail.overview_subtitle": "Track status, federation ownership, and last update.",
+    "event_detail.summary_location": "Location",
+    "event_detail.summary_dates": "Dates",
+    "event_detail.summary_federation": "Federation",
+    "event_detail.summary_status": "Live status",
+    "event_detail.schedule_title": "Sessions & timetable",
+    "event_detail.schedule_subtitle": "Monitor blocks of competition and venues.",
+    "event_detail.schedule_empty": "No sessions have been scheduled yet.",
+    "event_detail.schedule_hint": "Create a session above or generate demo data to populate the timeline.",
+    "event_detail.disciplines_title": "Events & scoreboards",
+    "event_detail.disciplines_subtitle": "Heat sheets update instantly for track-side ops.",
+    "event_detail.disciplines_empty": "No disciplines are attached to this meet yet.",
+    "event_detail.disciplines_hint": "Generate demo data or use the API to seed events.",
+    "event_detail.last_update": "Updated",
+    "event_detail.status.scheduled": "Scheduled",
+    "event_detail.status.live": "Live",
+    "event_detail.status.completed": "Completed",
+    "event_detail.status.delayed": "Delayed",
+    "event_detail.status.finalized": "Finalized",
+    "event_detail.status.ready": "Ready",
+    "event_detail.status.finished": "Finished",
+    "event_detail.status.dns": "Did not start",
+    "event_detail.status.dq": "Disqualified",
+    "event_detail.table_position": "Pos",
+    "event_detail.table_lane": "Lane",
+    "event_detail.table_athlete": "Athlete",
+    "event_detail.table_team": "Team / Roster",
+    "event_detail.table_result": "Result",
+    "event_detail.table_points": "Points",
+    "event_detail.table_status": "Status",
+    "event_detail.meta.sessions": "{count} sessions scheduled",
+    "event_detail.meta.sessions_single": "1 session scheduled",
+    "event_detail.meta.live_sessions": "{count} session live",
+    "event_detail.meta.live_sessions_plural": "{count} sessions live",
+    "event_detail.generate_toast": "Demo timeline generated for this meet.",
+    "event_detail.demo_error": "Unable to generate the demo timeline.",
+    "event_detail.refresh_error": "Unable to load live event data.",
+    "event_detail.group_unscheduled": "Unassigned session",
+    "event_detail.scoreboard_empty": "No entries yet",
     "home.rosters_title": "Rosters",
     "home.rosters_subtitle": "Keep squads aligned with verified athlete eligibility.",
     "home.rosters_empty": "No rosters available yet.",
@@ -294,6 +337,49 @@ const translations = {
     "home.events_submit": "Crear evento",
     "home.events_empty": "Todavía no hay eventos programados.",
     "home.events_hint": "Usa el formulario o recarga el calendario curado de eventos.",
+    "event_detail.eyebrow": "Operaciones en vivo",
+    "event_detail.refresh": "Actualizar",
+    "event_detail.generate_demo": "Generar cronograma demo",
+    "event_detail.overview_title": "Resumen del evento",
+    "event_detail.overview_subtitle": "Controla estado, federación responsable y última actualización.",
+    "event_detail.summary_location": "Ubicación",
+    "event_detail.summary_dates": "Fechas",
+    "event_detail.summary_federation": "Federación",
+    "event_detail.summary_status": "Estado en vivo",
+    "event_detail.schedule_title": "Sesiones y horario",
+    "event_detail.schedule_subtitle": "Monitorea bloques de competencia y sedes.",
+    "event_detail.schedule_empty": "No hay sesiones programadas aún.",
+    "event_detail.schedule_hint": "Crea una sesión arriba o genera datos demo para poblar la agenda.",
+    "event_detail.disciplines_title": "Pruebas y tableros",
+    "event_detail.disciplines_subtitle": "Las hojas de prueba se actualizan al instante en pista.",
+    "event_detail.disciplines_empty": "No hay pruebas asociadas a este meeting todavía.",
+    "event_detail.disciplines_hint": "Genera datos demo o usa la API para cargar pruebas.",
+    "event_detail.last_update": "Actualizado",
+    "event_detail.status.scheduled": "Programado",
+    "event_detail.status.live": "En vivo",
+    "event_detail.status.completed": "Completado",
+    "event_detail.status.delayed": "Retrasado",
+    "event_detail.status.finalized": "Finalizado",
+    "event_detail.status.ready": "Listo",
+    "event_detail.status.finished": "Terminado",
+    "event_detail.status.dns": "No salió",
+    "event_detail.status.dq": "Descalificado",
+    "event_detail.table_position": "Pos",
+    "event_detail.table_lane": "Carril",
+    "event_detail.table_athlete": "Atleta",
+    "event_detail.table_team": "Equipo / Roster",
+    "event_detail.table_result": "Resultado",
+    "event_detail.table_points": "Puntos",
+    "event_detail.table_status": "Estado",
+    "event_detail.meta.sessions": "{count} sesiones programadas",
+    "event_detail.meta.sessions_single": "1 sesión programada",
+    "event_detail.meta.live_sessions": "{count} sesión en vivo",
+    "event_detail.meta.live_sessions_plural": "{count} sesiones en vivo",
+    "event_detail.generate_toast": "Cronograma demo generado para este meeting.",
+    "event_detail.demo_error": "No se pudo generar el cronograma demo.",
+    "event_detail.refresh_error": "No se pudo cargar la información en vivo del evento.",
+    "event_detail.group_unscheduled": "Sesión sin asignar",
+    "event_detail.scoreboard_empty": "Aún sin participantes",
     "home.rosters_title": "Planteles",
     "home.rosters_subtitle": "Mantén los equipos alineados con elegibilidad verificada.",
     "home.rosters_empty": "Aún no hay planteles disponibles.",
@@ -475,6 +561,49 @@ const translations = {
     "home.events_submit": "Criar evento",
     "home.events_empty": "Nenhum evento agendado ainda.",
     "home.events_hint": "Use o formulário ou recarregue o calendário curado.",
+    "event_detail.eyebrow": "Operações ao vivo",
+    "event_detail.refresh": "Atualizar",
+    "event_detail.generate_demo": "Gerar cronograma demo",
+    "event_detail.overview_title": "Visão geral do evento",
+    "event_detail.overview_subtitle": "Acompanhe status, federação responsável e última atualização.",
+    "event_detail.summary_location": "Local",
+    "event_detail.summary_dates": "Datas",
+    "event_detail.summary_federation": "Federação",
+    "event_detail.summary_status": "Status ao vivo",
+    "event_detail.schedule_title": "Sessões e agenda",
+    "event_detail.schedule_subtitle": "Monitore blocos de competição e locais.",
+    "event_detail.schedule_empty": "Nenhuma sessão agendada ainda.",
+    "event_detail.schedule_hint": "Crie uma sessão acima ou gere dados demo para preencher a agenda.",
+    "event_detail.disciplines_title": "Provas e placares",
+    "event_detail.disciplines_subtitle": "As heat sheets atualizam instantaneamente na pista.",
+    "event_detail.disciplines_empty": "Nenhuma prova vinculada a este meeting ainda.",
+    "event_detail.disciplines_hint": "Gere dados demo ou use a API para cadastrar provas.",
+    "event_detail.last_update": "Atualizado",
+    "event_detail.status.scheduled": "Programado",
+    "event_detail.status.live": "Ao vivo",
+    "event_detail.status.completed": "Concluído",
+    "event_detail.status.delayed": "Atrasado",
+    "event_detail.status.finalized": "Finalizado",
+    "event_detail.status.ready": "Pronto",
+    "event_detail.status.finished": "Finalizado",
+    "event_detail.status.dns": "Não largou",
+    "event_detail.status.dq": "Desclassificado",
+    "event_detail.table_position": "Pos",
+    "event_detail.table_lane": "Raia",
+    "event_detail.table_athlete": "Atleta",
+    "event_detail.table_team": "Equipe / Roster",
+    "event_detail.table_result": "Resultado",
+    "event_detail.table_points": "Pontos",
+    "event_detail.table_status": "Status",
+    "event_detail.meta.sessions": "{count} sessões agendadas",
+    "event_detail.meta.sessions_single": "1 sessão agendada",
+    "event_detail.meta.live_sessions": "{count} sessão ao vivo",
+    "event_detail.meta.live_sessions_plural": "{count} sessões ao vivo",
+    "event_detail.generate_toast": "Cronograma demo gerado para este meeting.",
+    "event_detail.demo_error": "Não foi possível gerar o cronograma demo.",
+    "event_detail.refresh_error": "Não foi possível carregar os dados ao vivo do evento.",
+    "event_detail.group_unscheduled": "Sessão sem atribuição",
+    "event_detail.scoreboard_empty": "Sem inscrições ainda",
     "home.rosters_title": "Elencos",
     "home.rosters_subtitle": "Mantenha as equipes alinhadas com elegibilidade verificada.",
     "home.rosters_empty": "Nenhum elenco disponível ainda.",
@@ -731,6 +860,7 @@ const sampleAthletes = [
 
 const sampleEvents = [
   {
+    id: 1,
     name: "Aurora Indoor Classic",
     location: "Oslo, Norway",
     start_date: "2024-02-10",
@@ -738,6 +868,7 @@ const sampleEvents = [
     federation_id: null,
   },
   {
+    id: 2,
     name: "Sunset Coast Invitational",
     location: "Porto, Portugal",
     start_date: "2024-04-22",
@@ -745,6 +876,7 @@ const sampleEvents = [
     federation_id: null,
   },
   {
+    id: 3,
     name: "Highlands Distance Festival",
     location: "Edinburgh, Scotland",
     start_date: "2024-09-14",
@@ -801,6 +933,196 @@ const sampleNews = [
   },
 ];
 
+function buildSampleEventDetail(eventId = 1) {
+  const now = new Date();
+  const start = new Date(now.getTime() - 3600000);
+  const end = new Date(now.getTime() + 2 * 86400000);
+  const sessionOneStart = new Date(now.getTime() - 1800000);
+  const sessionOneEnd = new Date(now.getTime() + 3600000);
+  const sessionTwoStart = new Date(now.getTime() + 7200000);
+  const sessionTwoEnd = new Date(now.getTime() + 10800000);
+  const sessions = [
+    {
+      id: 1,
+      event_id: eventId,
+      name: "Morning Session",
+      start_time: sessionOneStart.toISOString(),
+      end_time: sessionOneEnd.toISOString(),
+      venue: "Main Stadium",
+      status: "live",
+      description: "Sample data session",
+    },
+    {
+      id: 2,
+      event_id: eventId,
+      name: "Evening Finals",
+      start_time: sessionTwoStart.toISOString(),
+      end_time: sessionTwoEnd.toISOString(),
+      venue: "Main Stadium",
+      status: "scheduled",
+      description: "Sample finals block",
+    },
+  ];
+  const disciplines = [
+    {
+      id: 1,
+      event_id: eventId,
+      session_id: sessions[0].id,
+      name: "100m",
+      category: "Sprints",
+      round_name: "Final",
+      scheduled_start: sessionOneStart.toISOString(),
+      scheduled_end: new Date(sessionOneStart.getTime() + 1800000).toISOString(),
+      status: "finalized",
+      venue: "Main Stadium",
+      order: 1,
+      session: { ...sessions[0] },
+      entries: [
+        {
+          id: 1,
+          discipline_id: 1,
+          athlete_name: "Valentina Ríos",
+          team_name: "Andean Flyers",
+          status: "finished",
+          lane: "4",
+          position: 1,
+          result: "11.32s",
+          points: 12,
+          updated_at: now.toISOString(),
+        },
+        {
+          id: 2,
+          discipline_id: 1,
+          athlete_name: "Mateo Herrera",
+          team_name: "Caribbean Storm",
+          status: "finished",
+          lane: "5",
+          position: 2,
+          result: "11.40s",
+          points: 10,
+          updated_at: now.toISOString(),
+        },
+        {
+          id: 3,
+          discipline_id: 1,
+          athlete_name: "Camila Ibáñez",
+          team_name: "Patagonia Peaks",
+          status: "finished",
+          lane: "3",
+          position: 3,
+          result: "11.55s",
+          points: 8,
+          updated_at: now.toISOString(),
+        },
+        {
+          id: 4,
+          discipline_id: 1,
+          athlete_name: "Thiago López",
+          team_name: "Amazon Striders",
+          status: "finished",
+          lane: "2",
+          position: 4,
+          result: "11.60s",
+          points: 6,
+          updated_at: now.toISOString(),
+        },
+      ],
+    },
+    {
+      id: 2,
+      event_id: eventId,
+      session_id: sessions[0].id,
+      name: "Long Jump",
+      category: "Jumps",
+      round_name: "Final",
+      scheduled_start: new Date(sessionOneStart.getTime() + 2400000).toISOString(),
+      scheduled_end: new Date(sessionOneStart.getTime() + 5400000).toISOString(),
+      status: "live",
+      venue: "Jumps Apron",
+      order: 2,
+      session: { ...sessions[0] },
+      entries: [
+        {
+          id: 5,
+          discipline_id: 2,
+          athlete_name: "Renata Gómez",
+          team_name: "Cusco Distance",
+          status: "live",
+          lane: null,
+          position: null,
+          result: "6.48m",
+          points: null,
+          updated_at: now.toISOString(),
+        },
+        {
+          id: 6,
+          discipline_id: 2,
+          athlete_name: "Daniel Torres",
+          team_name: "Granada Hurdlers",
+          status: "live",
+          lane: null,
+          position: null,
+          result: "6.30m",
+          points: null,
+          updated_at: now.toISOString(),
+        },
+      ],
+    },
+    {
+      id: 3,
+      event_id: eventId,
+      session_id: sessions[1].id,
+      name: "4x400m Relay",
+      category: "Relays",
+      round_name: "Final",
+      scheduled_start: sessionTwoStart.toISOString(),
+      scheduled_end: new Date(sessionTwoStart.getTime() + 3600000).toISOString(),
+      status: "scheduled",
+      venue: "Main Stadium",
+      order: 1,
+      session: { ...sessions[1] },
+      entries: [
+        {
+          id: 7,
+          discipline_id: 3,
+          athlete_name: "Pacífico Runners",
+          team_name: "Pacífico Runners",
+          status: "scheduled",
+          lane: "4",
+          position: null,
+          result: null,
+          points: null,
+          updated_at: now.toISOString(),
+        },
+        {
+          id: 8,
+          discipline_id: 3,
+          athlete_name: "Quito Relays",
+          team_name: "Quito Relays",
+          status: "scheduled",
+          lane: "5",
+          position: null,
+          result: null,
+          points: null,
+          updated_at: now.toISOString(),
+        },
+      ],
+    },
+  ];
+
+  return {
+    id: eventId,
+    name: "Aurora Indoor Classic",
+    location: "Oslo, Norway",
+    start_date: start.toISOString(),
+    end_date: end.toISOString(),
+    federation_id: null,
+    sessions,
+    disciplines,
+    latest_update: now.toISOString(),
+  };
+}
+
 const state = {
   athletes: [],
   events: [],
@@ -811,6 +1133,67 @@ const state = {
   news: sampleNews.slice(),
   federationToken: null,
 };
+
+function formatDateTime(value) {
+  if (!value) {
+    return "";
+  }
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+  return date.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function formatTimeRange(start, end) {
+  const startDate = start ? new Date(start) : null;
+  const endDate = end ? new Date(end) : null;
+  if (startDate && Number.isNaN(startDate.getTime())) {
+    return "";
+  }
+  if (endDate && Number.isNaN(endDate.getTime())) {
+    return "";
+  }
+  if (startDate && endDate) {
+    const sameDay = startDate.toDateString() === endDate.toDateString();
+    const startText = startDate.toLocaleString(undefined, {
+      month: sameDay ? undefined : "short",
+      day: sameDay ? undefined : "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    const endText = endDate.toLocaleString(undefined, {
+      month: sameDay ? undefined : "short",
+      day: sameDay ? undefined : "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+    return `${startText} – ${endText}`;
+  }
+  if (startDate) {
+    return startDate.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  if (endDate) {
+    return endDate.toLocaleString(undefined, {
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+  return "";
+}
 
 function formatDate(value) {
   if (!value) {
@@ -900,8 +1283,9 @@ if (pageId === "home") {
       const start = event.start_date ? new Date(event.start_date) : null;
       const end = event.end_date ? new Date(event.end_date) : null;
       const dateRange = start && end ? `${formatDate(start)} – ${formatDate(end)}` : "Date TBA";
+      const eventLink = event.id ? `<a href="/events/${event.id}">${event.name}</a>` : event.name;
       item.innerHTML = `
-        <h3>${event.name}</h3>
+        <h3>${eventLink}</h3>
         <div class="card-meta">
           <span class="tag">${event.location}</span>
           <span>${dateRange}</span>
@@ -1005,11 +1389,13 @@ if (pageId === "home") {
       events.forEach((event) => {
         const start = event.start_date ? new Date(event.start_date) : null;
         const end = event.end_date ? new Date(event.end_date) : null;
+        const eventId = event.id ?? null;
         results.push({
           category: "Events",
           title: event.name,
           subtitle: event.location,
           detail: start && end ? `${formatDate(start)} – ${formatDate(end)}` : "Dates TBA",
+          url: eventId ? `/events/${eventId}` : undefined,
         });
       });
     }
@@ -1123,6 +1509,7 @@ if (pageId === "home") {
       renderSearchResults();
     } catch (error) {
       const fallback = sampleEvents.map((event, index) => ({
+        id: event.id ?? index + 1,
         ...event,
         start_date: event.start_date || new Date(Date.now() + index * 604800000).toISOString(),
         end_date: event.end_date || new Date(Date.now() + (index * 604800000) + 86400000).toISOString(),
@@ -1390,13 +1777,14 @@ if (pageId === "events") {
       const end = event.end_date ? formatDate(event.end_date) : "";
       const item = document.createElement("li");
       item.className = "card";
+      const titleMarkup = event.id ? `<a href="/events/${event.id}">${event.name}</a>` : event.name;
       item.innerHTML = `
         <div class="card-meta">
           <span class="tag">${event.location || "TBA"}</span>
           ${start ? `<span>${start}${end ? ` – ${end}` : ""}</span>` : ""}
           ${event.federation_id ? `<span>Federation #${event.federation_id}</span>` : ""}
         </div>
-        <h3>${event.name}</h3>
+        <h3>${titleMarkup}</h3>
       `;
       list.appendChild(item);
     });
@@ -1408,6 +1796,7 @@ if (pageId === "events") {
       renderEventsPage();
     } catch (error) {
       events = sampleEvents.map((event, index) => ({
+        id: event.id ?? index + 1,
         ...event,
         start_date: event.start_date || new Date(Date.now() + index * 604800000).toISOString(),
         end_date: event.end_date || new Date(Date.now() + (index * 604800000) + 86400000).toISOString(),
@@ -1433,6 +1822,407 @@ if (pageId === "events") {
   }
 
   loadEventsPage();
+}
+if (pageId === "event-detail") {
+  const root = document.querySelector("#event-detail");
+  const nameElement = document.querySelector("#event-detail-name");
+  const metaElement = document.querySelector("#event-detail-meta");
+  const summaryLocation = document.querySelector("#event-summary-location");
+  const summaryDates = document.querySelector("#event-summary-dates");
+  const summaryFederation = document.querySelector("#event-summary-federation");
+  const summaryStatus = document.querySelector("#event-summary-status");
+  const sessionsList = document.querySelector("#event-session-list");
+  const sessionsEmpty = document.querySelector("#event-sessions-empty");
+  const disciplinesContainer = document.querySelector("#event-discipline-container");
+  const disciplinesEmpty = document.querySelector("#event-disciplines-empty");
+  const latestUpdateLabel = document.querySelector("#event-latest-update");
+  const refreshButton = document.querySelector("#event-refresh");
+  const demoButton = document.querySelector("#event-generate-demo");
+
+  if (!root) {
+    return;
+  }
+
+  const rawEventId = Number.parseInt(root.dataset.eventId || "", 10);
+  const eventId = Number.isNaN(rawEventId) ? null : rawEventId;
+  let detail = null;
+
+  function t(key) {
+    const dictionary = translations[document.documentElement.lang] || translations.en;
+    return dictionary[key] || translations.en[key] || key;
+  }
+
+  function statusLabel(status) {
+    if (!status) {
+      return "";
+    }
+    const normalized = String(status).toLowerCase();
+    const key = `event_detail.status.${normalized}`;
+    const label = t(key);
+    return label === key ? String(status) : label;
+  }
+
+  function createStatusChip(status) {
+    if (!status) {
+      return "";
+    }
+    const label = statusLabel(status);
+    const normalized = String(status).toLowerCase();
+    return `<span class="status-chip status-${normalized}">${label}</span>`;
+  }
+
+  function renderHeader() {
+    if (!detail) {
+      return;
+    }
+    if (nameElement) {
+      nameElement.textContent = detail.name || "—";
+    }
+    if (metaElement) {
+      const parts = [];
+      if (detail.location) {
+        parts.push(detail.location);
+      }
+      if (detail.start_date && detail.end_date) {
+        parts.push(`${formatDate(detail.start_date)} – ${formatDate(detail.end_date)}`);
+      } else if (detail.start_date) {
+        parts.push(formatDate(detail.start_date));
+      }
+      const liveCount = Array.isArray(detail.sessions)
+        ? detail.sessions.filter((session) => session.status === "live").length
+        : 0;
+      const totalSessions = detail.sessions?.length ?? 0;
+      if (liveCount > 0) {
+        parts.push(
+          liveCount === 1
+            ? t("event_detail.meta.live_sessions").replace("{count}", String(liveCount))
+            : t("event_detail.meta.live_sessions_plural").replace("{count}", String(liveCount))
+        );
+      } else if (totalSessions > 0) {
+        parts.push(
+          totalSessions === 1
+            ? t("event_detail.meta.sessions_single")
+            : t("event_detail.meta.sessions").replace("{count}", String(totalSessions))
+        );
+      }
+      metaElement.textContent = parts.join(" · ") || "";
+    }
+  }
+
+  function renderSummary() {
+    if (!detail) {
+      return;
+    }
+    if (summaryLocation) {
+      summaryLocation.textContent = detail.location || "—";
+    }
+    if (summaryDates) {
+      if (detail.start_date && detail.end_date) {
+        summaryDates.textContent = `${formatDate(detail.start_date)} – ${formatDate(detail.end_date)}`;
+      } else if (detail.start_date) {
+        summaryDates.textContent = formatDate(detail.start_date);
+      } else {
+        summaryDates.textContent = "—";
+      }
+    }
+    if (summaryFederation) {
+      summaryFederation.textContent = detail.federation_id
+        ? `#${detail.federation_id}`
+        : "—";
+    }
+    if (summaryStatus) {
+      const sessionStatuses = Array.isArray(detail.sessions)
+        ? detail.sessions.map((session) => session.status)
+        : [];
+      const disciplineStatuses = Array.isArray(detail.disciplines)
+        ? detail.disciplines.map((discipline) => discipline.status)
+        : [];
+      let summaryKey = "scheduled";
+      if (disciplineStatuses.includes("live") || sessionStatuses.includes("live")) {
+        summaryKey = "live";
+      } else if (disciplineStatuses.includes("finalized") || sessionStatuses.includes("completed")) {
+        summaryKey = "finalized";
+      } else if (sessionStatuses.includes("completed")) {
+        summaryKey = "completed";
+      }
+      summaryStatus.innerHTML = createStatusChip(summaryKey);
+    }
+    if (latestUpdateLabel) {
+      if (detail.latest_update) {
+        latestUpdateLabel.textContent = `${t("event_detail.last_update")}: ${formatDateTime(detail.latest_update)}`;
+      } else {
+        latestUpdateLabel.textContent = t("event_detail.last_update");
+      }
+    }
+  }
+
+  function renderSessions() {
+    if (!sessionsList || !sessionsEmpty) {
+      return;
+    }
+    sessionsList.innerHTML = "";
+    const sessions = Array.isArray(detail?.sessions) ? detail.sessions.slice() : [];
+    if (!sessions.length) {
+      sessionsEmpty.hidden = false;
+      return;
+    }
+    sessionsEmpty.hidden = true;
+    sessions
+      .sort((a, b) => {
+        const aTime = a.start_time ? new Date(a.start_time).getTime() : 0;
+        const bTime = b.start_time ? new Date(b.start_time).getTime() : 0;
+        return aTime - bTime;
+      })
+      .forEach((session) => {
+        const item = document.createElement("li");
+        item.className = "session-item";
+        const metaParts = [];
+        const timeRange = formatTimeRange(session.start_time, session.end_time);
+        if (timeRange) {
+          metaParts.push(timeRange);
+        }
+        if (session.venue) {
+          metaParts.push(session.venue);
+        }
+        if (session.description) {
+          metaParts.push(session.description);
+        }
+        item.innerHTML = `
+          <div class="session-item-header">
+            <h3>${session.name}</h3>
+            ${createStatusChip(session.status)}
+          </div>
+          <p class="session-item-meta">${metaParts.join(" · ")}</p>
+        `;
+        sessionsList.appendChild(item);
+      });
+  }
+
+  function renderDisciplines() {
+    if (!disciplinesContainer || !disciplinesEmpty) {
+      return;
+    }
+    disciplinesContainer.innerHTML = "";
+    const disciplines = Array.isArray(detail?.disciplines) ? detail.disciplines.slice() : [];
+    if (!disciplines.length) {
+      disciplinesEmpty.hidden = false;
+      return;
+    }
+    disciplinesEmpty.hidden = true;
+
+    const groups = new Map();
+    disciplines.forEach((discipline) => {
+      const key = discipline.session_id ?? "unscheduled";
+      if (!groups.has(key)) {
+        groups.set(key, {
+          session: discipline.session ?? null,
+          disciplines: [],
+        });
+      }
+      groups.get(key).disciplines.push(discipline);
+    });
+
+    const sortedGroups = Array.from(groups.values()).sort((a, b) => {
+      const aTime = a.session?.start_time ? new Date(a.session.start_time).getTime() : 0;
+      const bTime = b.session?.start_time ? new Date(b.session.start_time).getTime() : 0;
+      return aTime - bTime;
+    });
+
+    sortedGroups.forEach((group) => {
+      const section = document.createElement("section");
+      section.className = "discipline-group";
+      const header = document.createElement("header");
+      header.className = "discipline-group-header";
+      const title = document.createElement("h3");
+      title.textContent = group.session?.name || t("event_detail.group_unscheduled");
+      header.appendChild(title);
+      if (group.session?.start_time || group.session?.end_time) {
+        const time = document.createElement("p");
+        time.className = "discipline-group-meta";
+        time.textContent = formatTimeRange(group.session?.start_time, group.session?.end_time);
+        header.appendChild(time);
+      }
+      section.appendChild(header);
+
+      const list = document.createElement("div");
+      list.className = "discipline-list";
+
+      group.disciplines
+        .slice()
+        .sort((a, b) => {
+          const aOrder = a.order ?? 0;
+          const bOrder = b.order ?? 0;
+          return aOrder - bOrder;
+        })
+        .forEach((discipline) => {
+          const card = document.createElement("article");
+          card.className = "discipline-card";
+          const metaParts = [];
+          const disciplineTime = formatTimeRange(discipline.scheduled_start, discipline.scheduled_end);
+          if (disciplineTime) {
+            metaParts.push(disciplineTime);
+          }
+          if (discipline.venue) {
+            metaParts.push(discipline.venue);
+          }
+          card.innerHTML = `
+            <div class="discipline-card-header">
+              <div>
+                <h4>${discipline.name}${discipline.round_name ? ` · ${discipline.round_name}` : ""}</h4>
+                <p class="discipline-meta">${metaParts.join(" · ")}</p>
+              </div>
+              ${createStatusChip(discipline.status)}
+            </div>
+          `;
+
+          const scoreboardWrapper = document.createElement("div");
+          scoreboardWrapper.className = "discipline-scoreboard";
+
+          const entries = Array.isArray(discipline.entries) ? discipline.entries.slice() : [];
+          if (!entries.length) {
+            const empty = document.createElement("p");
+            empty.className = "scoreboard-empty";
+            empty.textContent = t("event_detail.scoreboard_empty");
+            scoreboardWrapper.appendChild(empty);
+          } else {
+            const table = document.createElement("table");
+            table.className = "scoreboard";
+            table.innerHTML = `
+              <thead>
+                <tr>
+                  <th scope="col">${t("event_detail.table_position")}</th>
+                  <th scope="col">${t("event_detail.table_lane")}</th>
+                  <th scope="col">${t("event_detail.table_athlete")}</th>
+                  <th scope="col">${t("event_detail.table_team")}</th>
+                  <th scope="col">${t("event_detail.table_result")}</th>
+                  <th scope="col">${t("event_detail.table_points")}</th>
+                  <th scope="col">${t("event_detail.table_status")}</th>
+                </tr>
+              </thead>
+            `;
+            const tbody = document.createElement("tbody");
+            entries
+              .sort((a, b) => {
+                const aPos = a.position ?? null;
+                const bPos = b.position ?? null;
+                if (aPos && bPos) {
+                  return aPos - bPos;
+                }
+                if (aPos && !bPos) {
+                  return -1;
+                }
+                if (!aPos && bPos) {
+                  return 1;
+                }
+                const aLane = a.lane ? Number.parseInt(a.lane, 10) : null;
+                const bLane = b.lane ? Number.parseInt(b.lane, 10) : null;
+                if (!Number.isNaN(aLane) && !Number.isNaN(bLane) && aLane !== null && bLane !== null) {
+                  return aLane - bLane;
+                }
+                return (a.athlete_name || "").localeCompare(b.athlete_name || "");
+              })
+              .forEach((entry) => {
+                const row = document.createElement("tr");
+                if (entry.position && entry.position <= 3) {
+                  row.classList.add(`scoreboard-medal-${entry.position}`);
+                }
+                const teamName = entry.team_name || entry.roster?.name || "—";
+                row.innerHTML = `
+                  <td>${entry.position ?? ""}</td>
+                  <td>${entry.lane ?? ""}</td>
+                  <td>${entry.athlete_name}</td>
+                  <td>${teamName}</td>
+                  <td>${entry.result ?? "—"}</td>
+                  <td>${entry.points ?? "—"}</td>
+                  <td>${statusLabel(entry.status)}</td>
+                `;
+                if (entry.notes) {
+                  const notesRow = document.createElement("tr");
+                  notesRow.className = "scoreboard-notes";
+                  notesRow.innerHTML = `
+                    <td colspan="7">${entry.notes}</td>
+                  `;
+                  tbody.appendChild(row);
+                  tbody.appendChild(notesRow);
+                } else {
+                  tbody.appendChild(row);
+                }
+              });
+            table.appendChild(tbody);
+            scoreboardWrapper.appendChild(table);
+          }
+
+          card.appendChild(scoreboardWrapper);
+          list.appendChild(card);
+        });
+
+      section.appendChild(list);
+      disciplinesContainer.appendChild(section);
+    });
+  }
+
+  function renderAll() {
+    if (!detail) {
+      return;
+    }
+    renderHeader();
+    renderSummary();
+    renderSessions();
+    renderDisciplines();
+  }
+
+  async function loadEventDetail() {
+    if (!eventId) {
+      detail = buildSampleEventDetail();
+      renderAll();
+      return;
+    }
+    try {
+      detail = await request(`/events/${eventId}`);
+      renderAll();
+    } catch (error) {
+      detail = buildSampleEventDetail(eventId);
+      renderAll();
+      notify("error", `${t("event_detail.refresh_error") || ""} (${error.message}). Showing demo data.`);
+      console.error(error);
+    }
+  }
+
+  if (refreshButton) {
+    refreshButton.addEventListener("click", () => {
+      loadEventDetail();
+    });
+  }
+
+  if (demoButton) {
+    demoButton.addEventListener("click", async () => {
+      if (!eventId) {
+        detail = buildSampleEventDetail();
+        renderAll();
+        notify("success", t("event_detail.generate_toast"));
+        return;
+      }
+      try {
+        demoButton.disabled = true;
+        await request(`/events/${eventId}/demo`, {
+          method: "POST",
+          body: JSON.stringify({
+            start_time: new Date().toISOString(),
+            include_results: true,
+          }),
+        });
+        notify("success", t("event_detail.generate_toast"));
+        await loadEventDetail();
+      } catch (error) {
+        notify("error", `${t("event_detail.demo_error") || ""} (${error.message}).`);
+        console.error(error);
+      } finally {
+        demoButton.disabled = false;
+      }
+    });
+  }
+
+  loadEventDetail();
 }
 if (pageId === "rosters") {
   const list = document.querySelector("#rosters-page-list");

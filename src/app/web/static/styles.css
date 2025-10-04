@@ -492,6 +492,212 @@ select:focus {
   font-size: 0.9rem;
 }
 
+.event-summary {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.event-summary div {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.event-summary dt {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.event-summary dd {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: rgba(148, 163, 184, 0.25);
+  color: var(--text);
+}
+
+.status-chip.status-live {
+  background: rgba(34, 197, 94, 0.2);
+  color: #bbf7d0;
+}
+
+.status-chip.status-finalized,
+.status-chip.status-completed {
+  background: rgba(59, 130, 246, 0.2);
+  color: #cbd5f5;
+}
+
+.status-chip.status-delayed,
+.status-chip.status-dq {
+  background: rgba(248, 113, 113, 0.2);
+  color: #fecaca;
+}
+
+.session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.session-item {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 0.9rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.6);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.session-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.session-item-header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.session-item-meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.discipline-groups {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.discipline-group {
+  display: grid;
+  gap: 1rem;
+}
+
+.discipline-group-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.discipline-group-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.discipline-group-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.discipline-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.discipline-card {
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.55);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.discipline-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.discipline-card-header h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.discipline-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.discipline-scoreboard {
+  overflow-x: auto;
+}
+
+.scoreboard {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 480px;
+}
+
+.scoreboard th,
+.scoreboard td {
+  text-align: left;
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.scoreboard thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.scoreboard tbody tr {
+  font-size: 0.92rem;
+}
+
+.scoreboard tbody tr:hover {
+  background: rgba(148, 163, 184, 0.08);
+}
+
+.scoreboard-medal-1 {
+  background: rgba(234, 179, 8, 0.12);
+}
+
+.scoreboard-medal-2 {
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.scoreboard-medal-3 {
+  background: rgba(249, 115, 22, 0.12);
+}
+
+.scoreboard-empty {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.scoreboard-notes td {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  padding-top: 0;
+}
+
 .tag {
   background: var(--highlight);
   color: var(--accent);
