@@ -17,8 +17,9 @@ A modular FastAPI backend that powers a South America-wide athletics portal. The
    pip install -r requirements.txt
    ```
 2. **Bootstrap the database**
+   > The project uses a `src/` layout, so either export `PYTHONPATH=src` once per shell session or prefix commands that import `app.*` modules.
    ```bash
-   python -c "import asyncio; from app.core.database import init_models; asyncio.run(init_models())"
+   PYTHONPATH=src python -c "import asyncio; from app.core.database import init_models; asyncio.run(init_models())"
    ```
 3. **Run the API**
    ```bash
