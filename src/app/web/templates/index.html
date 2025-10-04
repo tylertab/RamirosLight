@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ramiro's Light - Athletics Hub</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Ramiro's Light</h1>
+      <p class="tagline">Discover athletes, explore events, and grow the athletics community.</p>
+    </header>
+
+    <main class="layout">
+      <section class="panel" aria-labelledby="athletes-title">
+        <div class="panel-header">
+          <div>
+            <h2 id="athletes-title">Athletes</h2>
+            <p class="panel-subtitle">Browse the current roster or register a new athlete profile.</p>
+          </div>
+          <button id="seed-athletes" class="secondary">Reload Sample Athletes</button>
+        </div>
+
+        <form id="athlete-form" class="form">
+          <h3>Create athlete</h3>
+          <div class="form-grid">
+            <label>
+              Full name
+              <input type="text" name="full_name" placeholder="Jane Runner" required />
+            </label>
+            <label>
+              Email
+              <input type="email" name="email" placeholder="jane@example.com" required />
+            </label>
+            <label>
+              Role
+              <input type="text" name="role" value="athlete" required />
+            </label>
+            <label>
+              Password
+              <input type="password" name="password" value="Password123" required />
+            </label>
+          </div>
+          <button type="submit" class="primary">Register athlete</button>
+        </form>
+
+        <div id="athletes-empty" class="empty-state" hidden>
+          <p>No athletes have been registered yet.</p>
+          <p class="hint">Use the form above or load the curated sample athletes to populate the roster.</p>
+        </div>
+
+        <ul id="athletes-list" class="card-list" aria-live="polite"></ul>
+      </section>
+
+      <section class="panel" aria-labelledby="events-title">
+        <div class="panel-header">
+          <div>
+            <h2 id="events-title">Events</h2>
+            <p class="panel-subtitle">Track the latest competitions and add new ones.</p>
+          </div>
+          <button id="seed-events" class="secondary">Reload Sample Events</button>
+        </div>
+
+        <form id="event-form" class="form">
+          <h3>Create event</h3>
+          <div class="form-grid">
+            <label>
+              Name
+              <input type="text" name="name" placeholder="Summer Invitational" required />
+            </label>
+            <label>
+              Location
+              <input type="text" name="location" placeholder="Lisbon, Portugal" required />
+            </label>
+            <label>
+              Start date
+              <input type="date" name="start_date" required />
+            </label>
+            <label>
+              End date
+              <input type="date" name="end_date" required />
+            </label>
+            <label>
+              Federation ID
+              <input type="number" name="federation_id" min="1" step="1" placeholder="Optional" />
+            </label>
+          </div>
+          <button type="submit" class="primary">Create event</button>
+        </form>
+
+        <div id="events-empty" class="empty-state" hidden>
+          <p>No events have been scheduled yet.</p>
+          <p class="hint">Use the form above or reload the curated calendar of sample events.</p>
+        </div>
+
+        <ul id="events-list" class="card-list" aria-live="polite"></ul>
+      </section>
+    </main>
+
+    <aside id="notifications" class="notifications" role="status" aria-live="assertive"></aside>
+
+    <footer class="app-footer">
+      <p>
+        Powered by FastAPI · API base: <code id="api-base">/api/v1</code>
+      </p>
+    </footer>
+
+    <script src="/static/app.js" type="module"></script>
+  </body>
+</html>
