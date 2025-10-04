@@ -42,11 +42,85 @@ def create_app() -> FastAPI:
     if static_dir.exists():
         application.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
+    def _template_response(
+        request: Request, template_name: str, *, page_id: str, fallback_markup: str
+    ) -> HTMLResponse:
+        if templates is not None:
+            context = {"request": request, "page_id": page_id}
+            return templates.TemplateResponse(template_name, context)
+        return HTMLResponse(content=fallback_markup)
+
     @application.get("/", response_class=HTMLResponse)
     async def render_index(request: Request) -> HTMLResponse:
-        if templates is not None:
-            return templates.TemplateResponse("index.html", {"request": request})
-        return HTMLResponse(content=index_markup)
+        return _template_response(
+            request,
+            "index.html",
+            page_id="home",
+            fallback_markup=index_markup,
+        )
+
+    @application.get("/profiles", response_class=HTMLResponse)
+    async def render_profiles(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "profiles.html",
+            page_id="profiles",
+            fallback_markup="<h1>Profiles</h1>",
+        )
+
+    @application.get("/events", response_class=HTMLResponse)
+    async def render_events_page(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "events.html",
+            page_id="events",
+            fallback_markup="<h1>Events</h1>",
+        )
+
+    @application.get("/rosters", response_class=HTMLResponse)
+    async def render_rosters_page(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "rosters.html",
+            page_id="rosters",
+            fallback_markup="<h1>Rosters</h1>",
+        )
+
+    @application.get("/login", response_class=HTMLResponse)
+    async def render_login(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "login.html",
+            page_id="login",
+            fallback_markup="<h1>Login</h1>",
+        )
+
+    @application.get("/signup", response_class=HTMLResponse)
+    async def render_signup(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "signup.html",
+            page_id="signup",
+            fallback_markup="<h1>Sign up</h1>",
+        )
+
+    @application.get("/federations/upload", response_class=HTMLResponse)
+    async def render_federations_upload(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "federations_upload.html",
+            page_id="federations-upload",
+            fallback_markup="<h1>Federations upload</h1>",
+        )
+
+    @application.get("/about", response_class=HTMLResponse)
+    async def render_about(request: Request) -> HTMLResponse:
+        return _template_response(
+            request,
+            "about.html",
+            page_id="about",
+            fallback_markup="<h1>About Trackeo</h1>",
+        )
 
     application.include_router(health.router, prefix=settings.api_v1_prefix)
     application.include_router(accounts.router, prefix=settings.api_v1_prefix)

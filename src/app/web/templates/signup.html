@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Create account – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="auth-shell">
+    <div class="auth-card">
+      <h1 data-l10n-key="signup.title">Create your Trackeo account</h1>
+      <p class="auth-subtitle" data-l10n-key="signup.subtitle">Join Trackeo to manage rosters, follow events, and unlock analytics.</p>
+
+      <form id="signup-form" class="form vertical">
+        <label>
+          <span data-l10n-key="form.full_name">Full name</span>
+          <input type="text" name="full_name" placeholder="Jane Runner" required data-l10n-placeholder="form.full_name_placeholder" />
+        </label>
+        <label>
+          <span data-l10n-key="form.email">Email</span>
+          <input type="email" name="email" placeholder="jane@example.com" required data-l10n-placeholder="form.email_placeholder" />
+        </label>
+        <label>
+          <span data-l10n-key="form.role">Role</span>
+          <select name="role" required>
+            <option value="fan" data-l10n-key="signup.role_fan">Fan</option>
+            <option value="athlete" data-l10n-key="signup.role_athlete">Athlete</option>
+            <option value="coach" data-l10n-key="signup.role_coach">Coach</option>
+            <option value="federation" data-l10n-key="signup.role_federation">Federation</option>
+            <option value="scout" data-l10n-key="signup.role_scout">Scout</option>
+          </select>
+        </label>
+        <label>
+          <span data-l10n-key="form.password">Password</span>
+          <input type="password" name="password" placeholder="Password123" required data-l10n-placeholder="form.password_placeholder" />
+        </label>
+        <label>
+          <span data-l10n-key="signup.tier">Subscription tier</span>
+          <select name="subscription_tier">
+            <option value="free" data-l10n-key="signup.tier_free">Free</option>
+            <option value="premium" data-l10n-key="signup.tier_premium">Premium</option>
+            <option value="coach" data-l10n-key="signup.tier_coach">Coach</option>
+            <option value="federation" data-l10n-key="signup.tier_federation">Federation</option>
+          </select>
+        </label>
+        <button type="submit" class="primary" data-l10n-key="signup.submit">Create account</button>
+      </form>
+
+      <p class="auth-switch">
+        <span data-l10n-key="signup.switch">Already registered?</span>
+        <a href="/login" data-l10n-key="signup.switch_link">Sign in.</a>
+      </p>
+    </div>
+  </section>
+{% endblock %}

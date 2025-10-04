@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Sign in – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="auth-shell">
+    <div class="auth-card">
+      <h1 data-l10n-key="login.title">Sign in to Trackeo</h1>
+      <p class="auth-subtitle" data-l10n-key="login.subtitle">Use your verified email address to access premium federation tools.</p>
+
+      <form id="login-form" class="form vertical">
+        <label>
+          <span data-l10n-key="form.email">Email</span>
+          <input type="email" name="username" placeholder="you@example.com" required data-l10n-placeholder="form.email_placeholder" />
+        </label>
+        <label>
+          <span data-l10n-key="form.password">Password</span>
+          <input type="password" name="password" placeholder="••••••••" required data-l10n-placeholder="form.password_placeholder" />
+        </label>
+        <button type="submit" class="primary" data-l10n-key="login.submit">Sign in</button>
+      </form>
+
+      <p class="auth-switch">
+        <span data-l10n-key="login.switch">Need an account?</span>
+        <a href="/signup" data-l10n-key="login.switch_link">Create one now.</a>
+      </p>
+    </div>
+  </section>
+{% endblock %}

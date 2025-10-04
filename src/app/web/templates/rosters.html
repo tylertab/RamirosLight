@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Rosters – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero">
+    <div>
+      <h1 data-l10n-key="rosters.title">Federation rosters</h1>
+      <p data-l10n-key="rosters.subtitle">Track eligibility, divisions, and staffing with live updates from the roster service.</p>
+    </div>
+    <div class="page-actions">
+      <button class="primary" type="button" id="rosters-refresh" data-l10n-key="rosters.refresh">Refresh rosters</button>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="rosters-directory-title">
+    <div class="panel-header">
+      <div>
+        <h2 id="rosters-directory-title" data-l10n-key="rosters.list_title">Latest submissions</h2>
+        <p class="panel-subtitle" data-l10n-key="rosters.list_subtitle">Verified rosters arrive through secure federation uploads.</p>
+      </div>
+      <input
+        id="rosters-filter"
+        class="inline-search"
+        type="search"
+        placeholder="Filter by club or country"
+        data-l10n-placeholder="rosters.filter_placeholder"
+        aria-label="Filter rosters"
+        data-l10n-aria-label="rosters.filter_aria"
+      />
+    </div>
+
+    <div id="rosters-page-empty" class="empty-state" hidden>
+      <p data-l10n-key="rosters.empty">No rosters are available yet.</p>
+      <p class="hint" data-l10n-key="rosters.hint">Federations can upload a roster file from the secure upload view.</p>
+    </div>
+
+    <ul id="rosters-page-list" class="card-list" aria-live="polite"></ul>
+  </section>
+{% endblock %}
