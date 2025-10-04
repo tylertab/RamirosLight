@@ -30,12 +30,14 @@ def anyio_backend():
 def configure_settings(tmp_path_factory: pytest.TempPathFactory):
     db_path = tmp_path_factory.mktemp("db") / "test_app.db"
     os.environ["ATHLETICS_DATABASE_URL"] = f"sqlite+aiosqlite:///{db_path}"
+    os.environ["ATHLETICS_SEED_DEMO_DATA"] = "false"
     SettingsSingleton.reset_instance()
     DatabaseSessionManager.reset_instance()
     asyncio.run(init_models())
     yield
     DatabaseSessionManager.reset_instance()
     SettingsSingleton.reset_instance()
+    os.environ.pop("ATHLETICS_SEED_DEMO_DATA", None)
     if Path(db_path).exists():
         Path(db_path).unlink()
 

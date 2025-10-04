@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI, Request
@@ -23,7 +24,13 @@ from app.services.bootstrap import seed_initial_data
 
 def create_app() -> FastAPI:
     settings = SettingsSingleton().instance
-    application = FastAPI(title=settings.project_name, version="1.0.0")
+    @asynccontextmanager
+    async def lifespan(application: FastAPI):
+        await init_models()
+        await seed_initial_data()
+        yield
+
+    application = FastAPI(title=settings.project_name, version="1.0.0", lifespan=lifespan)
 
     base_dir = Path(__file__).resolve().parent
     template_dir = base_dir / "app" / "web" / "templates"
@@ -171,11 +178,6 @@ def create_app() -> FastAPI:
     application.include_router(news.router, prefix=settings.api_v1_prefix)
     application.include_router(search.router, prefix=settings.api_v1_prefix)
     application.include_router(federations.router, prefix=settings.api_v1_prefix)
-
-    @application.on_event("startup")
-    async def _create_tables() -> None:
-        await init_models()
-        await seed_initial_data()
 
     return application
 

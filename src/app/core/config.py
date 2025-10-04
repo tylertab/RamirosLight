@@ -28,6 +28,7 @@ class Settings(BaseSettings):
         "coach": 29.0,
     }
     subscription_currency: str = "USD"
+    seed_demo_data: bool = True
 
     @cached_property
     def base_path(self) -> Path:
