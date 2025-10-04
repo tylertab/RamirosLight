@@ -35,6 +35,11 @@ class AccountsService:
         await self._session.refresh(user)
         return UserRead.model_validate(user)
 
+    async def list_users(self) -> list[UserRead]:
+        result = await self._session.execute(select(User))
+        users = result.scalars().all()
+        return [UserRead.model_validate(user) for user in users]
+
 
 async def get_accounts_service(
     session: AsyncSession = Depends(get_session),
