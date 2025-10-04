@@ -25,6 +25,7 @@
 
 ## Data Model Summary
 - `users`: core identities with roles (fan, athlete, coach, scout, federation, admin).
+- `federations`: directory of validated organizing bodies linked to events.
 - `events`: metadata describing meets, location, start/end dates, and associated federations.
 - `federation_submissions`: queue of ingestion payloads with status tracking.
 

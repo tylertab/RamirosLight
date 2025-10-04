@@ -4,6 +4,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 from .base import Base
 
 
+class Federation(Base):
+    __tablename__ = "federations"
+
+    id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
+    country: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    website: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+
 class FederationSubmission(Base):
     __tablename__ = "federation_submissions"
 
