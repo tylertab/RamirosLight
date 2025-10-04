@@ -187,7 +187,7 @@
       <ul id="news-list" class="card-list" aria-live="polite"></ul>
     </section>
 
-    <section id="premium" class="panel panel-wide premium-panel" aria-labelledby="premium-title">
+  <section id="premium" class="panel panel-wide premium-panel" aria-labelledby="premium-title">
       <div class="panel-header">
         <div>
           <h2 id="premium-title" data-l10n-key="premium.title">Coach &amp; Federation tiers</h2>
@@ -250,4 +250,8 @@
       </div>
     </section>
   </section>
+
+  {% if initial_home %}
+    <script id="initial-home-data" type="application/json">{{ initial_home | tojson }}</script>
+  {% endif %}
 {% endblock %}
