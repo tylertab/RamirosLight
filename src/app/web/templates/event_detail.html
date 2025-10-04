@@ -3,6 +3,9 @@
 {% block title %}Event Detail – Trackeo{% endblock %}
 
 {% block content %}
+  {% if initial_event %}
+    <script id="initial-event-data" type="application/json">{{ initial_event | tojson }}</script>
+  {% endif %}
   <section class="page-hero" id="event-detail" data-event-id="{{ event_id }}">
     <div>
       <p class="eyebrow" data-l10n-key="event_detail.eyebrow">Live meet operations</p>

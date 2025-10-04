@@ -6,6 +6,26 @@ const localeSwitcher = document.querySelector("#locale-switcher");
 const headerLoginButton = document.querySelector("#header-login");
 const headerSignupButton = document.querySelector("#header-signup");
 const apiBaseLabel = document.querySelector("#api-base");
+const initialHomeDataElement = document.querySelector("#initial-home-data");
+const initialEventDataElement = document.querySelector("#initial-event-data");
+let initialHomeData = null;
+let initialEventData = null;
+
+if (initialHomeDataElement?.textContent) {
+  try {
+    initialHomeData = JSON.parse(initialHomeDataElement.textContent.trim());
+  } catch (error) {
+    console.warn("Unable to parse initial home data", error);
+  }
+}
+
+if (initialEventDataElement?.textContent) {
+  try {
+    initialEventData = JSON.parse(initialEventDataElement.textContent.trim());
+  } catch (error) {
+    console.warn("Unable to parse initial event data", error);
+  }
+}
 
 if (apiBaseLabel) {
   apiBaseLabel.textContent = API_BASE;
@@ -1237,6 +1257,21 @@ if (pageId === "home") {
 
   let activeSearchFilter = "all";
 
+  if (initialHomeData) {
+    if (Array.isArray(initialHomeData.athletes) && initialHomeData.athletes.length) {
+      state.athletes = initialHomeData.athletes;
+    }
+    if (Array.isArray(initialHomeData.events) && initialHomeData.events.length) {
+      state.events = initialHomeData.events;
+    }
+    if (Array.isArray(initialHomeData.rosters) && initialHomeData.rosters.length) {
+      state.rosters = initialHomeData.rosters;
+    }
+    if (Array.isArray(initialHomeData.news) && initialHomeData.news.length) {
+      state.news = initialHomeData.news;
+    }
+  }
+
   function renderAthletes() {
     if (!athleteList || !athleteEmpty) {
       return;
@@ -1845,7 +1880,7 @@ if (pageId === "event-detail") {
 
   const rawEventId = Number.parseInt(root.dataset.eventId || "", 10);
   const eventId = Number.isNaN(rawEventId) ? null : rawEventId;
-  let detail = null;
+  let detail = initialEventData ?? null;
 
   function t(key) {
     const dictionary = translations[document.documentElement.lang] || translations.en;
@@ -2169,6 +2204,10 @@ if (pageId === "event-detail") {
     renderSummary();
     renderSessions();
     renderDisciplines();
+  }
+
+  if (detail) {
+    renderAll();
   }
 
   async function loadEventDetail() {

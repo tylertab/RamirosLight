@@ -9,6 +9,7 @@ from fastapi.templating import Jinja2Templates
 from app.api.v1.routes import (
     accounts,
     athletes,
+    bootstrap,
     events,
     federations,
     health,
@@ -20,6 +21,7 @@ from app.api.v1.routes import (
 from app.core.config import SettingsSingleton
 from app.core.database import init_models
 from app.services.bootstrap import seed_initial_data
+from app.services.home import get_event_detail_snapshot, get_home_snapshot
 
 
 def create_app() -> FastAPI:
@@ -67,11 +69,17 @@ def create_app() -> FastAPI:
 
     @application.get("/", response_class=HTMLResponse)
     async def render_index(request: Request) -> HTMLResponse:
+        home_snapshot = await get_home_snapshot()
         return _template_response(
             request,
             "index.html",
             page_id="home",
             fallback_markup=index_markup,
+            context={
+                "initial_home": home_snapshot.model_dump(mode="json")
+                if home_snapshot
+                else None,
+            },
         )
 
     @application.get("/profiles", response_class=HTMLResponse)
@@ -106,12 +114,18 @@ def create_app() -> FastAPI:
     async def render_event_detail(
         request: Request, event_id: int
     ) -> HTMLResponse:
+        detail_snapshot = await get_event_detail_snapshot(event_id)
         return _template_response(
             request,
             "event_detail.html",
             page_id="event-detail",
             fallback_markup=f"<h1>Event #{event_id}</h1>",
-            context={"event_id": event_id},
+            context={
+                "event_id": event_id,
+                "initial_event": detail_snapshot.model_dump(mode="json")
+                if detail_snapshot
+                else None,
+            },
         )
 
     @application.get("/rosters", response_class=HTMLResponse)
@@ -173,6 +187,7 @@ def create_app() -> FastAPI:
     application.include_router(accounts.router, prefix=settings.api_v1_prefix)
     application.include_router(subscriptions.router, prefix=settings.api_v1_prefix)
     application.include_router(athletes.router, prefix=settings.api_v1_prefix)
+    application.include_router(bootstrap.router, prefix=settings.api_v1_prefix)
     application.include_router(events.router, prefix=settings.api_v1_prefix)
     application.include_router(rosters.router, prefix=settings.api_v1_prefix)
     application.include_router(news.router, prefix=settings.api_v1_prefix)

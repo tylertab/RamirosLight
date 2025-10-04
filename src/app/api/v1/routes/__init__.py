@@ -1,6 +1,7 @@
 from . import (
     accounts,
     athletes,
+    bootstrap,
     events,
     federations,
     health,
@@ -13,6 +14,7 @@ from . import (
 __all__ = [
     "accounts",
     "athletes",
+    "bootstrap",
     "events",
     "federations",
     "health",
