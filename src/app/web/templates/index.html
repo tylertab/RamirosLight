@@ -3,107 +3,282 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ramiro's Light - Athletics Hub</title>
+    <title>Trackeo – Latin American Athletics Intelligence</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <header class="app-header">
-      <h1>Ramiro's Light</h1>
-      <p class="tagline">Discover athletes, explore events, and grow the athletics community.</p>
+    <header class="site-header">
+      <div class="brand">
+        <span class="logo">Trackeo</span>
+        <span class="badge">Beta</span>
+      </div>
+      <nav class="header-nav" aria-label="Primary">
+        <a class="nav-link" href="#search">Search</a>
+        <a class="nav-link" href="#premium">Plans</a>
+        <a class="nav-link" href="#federations">Federations</a>
+      </nav>
+      <div class="header-actions">
+        <label class="locale-picker">
+          <span class="sr-only">Choose language</span>
+          <select id="locale-switcher">
+            <option value="en">EN · English</option>
+            <option value="es">ES · Español</option>
+            <option value="pt">PT · Português</option>
+          </select>
+        </label>
+        <button class="ghost" type="button" id="header-login">Log in</button>
+        <button class="primary" type="button" id="header-signup">Create account</button>
+      </div>
     </header>
 
-    <main class="layout">
-      <section class="panel" aria-labelledby="athletes-title">
-        <div class="panel-header">
-          <div>
-            <h2 id="athletes-title">Athletes</h2>
-            <p class="panel-subtitle">Browse the current roster or register a new athlete profile.</p>
+    <main>
+      <section class="hero" id="hero">
+        <div class="hero-content">
+          <p class="eyebrow">Latin American Athletics Intelligence</p>
+          <h1>Trackeo connects federations, coaches, and fans across the Americas.</h1>
+          <p class="hero-description">
+            Explore verified performances, multilingual news, and premium insights that highlight the
+            rise of track &amp; field from São Paulo to Bogotá. Built in Atlanta for the continent.
+          </p>
+          <div class="hero-cta">
+            <button class="primary" type="button" id="hero-explore">Explore as guest</button>
+            <button class="ghost" type="button" id="hero-subscribe">View coach plans</button>
           </div>
-          <button id="seed-athletes" class="secondary">Reload Sample Athletes</button>
         </div>
-
-        <form id="athlete-form" class="form">
-          <h3>Create athlete</h3>
-          <div class="form-grid">
-            <label>
-              Full name
-              <input type="text" name="full_name" placeholder="Jane Runner" required />
-            </label>
-            <label>
-              Email
-              <input type="email" name="email" placeholder="jane@example.com" required />
-            </label>
-            <label>
-              Role
-              <input type="text" name="role" value="athlete" required />
-            </label>
-            <label>
-              Password
-              <input type="password" name="password" value="Password123" required />
-            </label>
+        <div class="hero-preview" aria-hidden="true">
+          <div class="preview-card">
+            <h3>Regional spotlight</h3>
+            <p>19 federations streaming live splits and heat sheets.</p>
+            <div class="preview-metrics">
+              <div>
+                <span class="metric-value">128</span>
+                <span class="metric-label">Verified meets</span>
+              </div>
+              <div>
+                <span class="metric-value">2.4k</span>
+                <span class="metric-label">Athletes tracked</span>
+              </div>
+              <div>
+                <span class="metric-value">320</span>
+                <span class="metric-label">Roster updates</span>
+              </div>
+            </div>
           </div>
-          <button type="submit" class="primary">Register athlete</button>
-        </form>
-
-        <div id="athletes-empty" class="empty-state" hidden>
-          <p>No athletes have been registered yet.</p>
-          <p class="hint">Use the form above or load the curated sample athletes to populate the roster.</p>
         </div>
-
-        <ul id="athletes-list" class="card-list" aria-live="polite"></ul>
       </section>
 
-      <section class="panel" aria-labelledby="events-title">
-        <div class="panel-header">
-          <div>
-            <h2 id="events-title">Events</h2>
-            <p class="panel-subtitle">Track the latest competitions and add new ones.</p>
-          </div>
-          <button id="seed-events" class="secondary">Reload Sample Events</button>
+      <section class="search-hub" id="search">
+        <div class="search-header">
+          <h2>Search Trackeo's universe</h2>
+          <p>Find athletes, events, rosters, and bilingual news in one place.</p>
         </div>
-
-        <form id="event-form" class="form">
-          <h3>Create event</h3>
-          <div class="form-grid">
-            <label>
-              Name
-              <input type="text" name="name" placeholder="Summer Invitational" required />
-            </label>
-            <label>
-              Location
-              <input type="text" name="location" placeholder="Lisbon, Portugal" required />
-            </label>
-            <label>
-              Start date
-              <input type="date" name="start_date" required />
-            </label>
-            <label>
-              End date
-              <input type="date" name="end_date" required />
-            </label>
-            <label>
-              Federation ID
-              <input type="number" name="federation_id" min="1" step="1" placeholder="Optional" />
-            </label>
-          </div>
-          <button type="submit" class="primary">Create event</button>
-        </form>
-
-        <div id="events-empty" class="empty-state" hidden>
-          <p>No events have been scheduled yet.</p>
-          <p class="hint">Use the form above or reload the curated calendar of sample events.</p>
+        <div class="search-bar">
+          <input id="global-search" type="search" placeholder="Search for an athlete, club, or meet" aria-label="Search Trackeo" />
         </div>
+        <div class="search-filters" role="tablist" aria-label="Search categories">
+          <button class="search-filter active" type="button" role="tab" aria-selected="true" data-filter="all">All</button>
+          <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="athletes">Athletes</button>
+          <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="events">Events</button>
+          <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="rosters">Rosters</button>
+          <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="news">News</button>
+        </div>
+        <div class="search-results-shell">
+          <p id="search-empty" class="search-empty">Start typing to explore Trackeo's data universe.</p>
+          <ul id="search-results" class="search-results" hidden aria-live="polite"></ul>
+        </div>
+      </section>
 
-        <ul id="events-list" class="card-list" aria-live="polite"></ul>
+      <section class="layout">
+        <section class="panel" aria-labelledby="athletes-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="athletes-title">Athletes</h2>
+              <p class="panel-subtitle">Browse the roster or showcase a rising star from your federation.</p>
+            </div>
+            <button id="seed-athletes" class="secondary" type="button">Reload Sample Athletes</button>
+          </div>
+
+          <details class="form-accordion">
+            <summary>Create athlete profile</summary>
+            <form id="athlete-form" class="form">
+              <div class="form-grid">
+                <label>
+                  Full name
+                  <input type="text" name="full_name" placeholder="Jane Runner" required />
+                </label>
+                <label>
+                  Email
+                  <input type="email" name="email" placeholder="jane@example.com" required />
+                </label>
+                <label>
+                  Role
+                  <input type="text" name="role" value="athlete" required />
+                </label>
+                <label>
+                  Password
+                  <input type="password" name="password" value="Password123" required />
+                </label>
+              </div>
+              <button type="submit" class="primary">Register athlete</button>
+            </form>
+          </details>
+
+          <div id="athletes-empty" class="empty-state" hidden>
+            <p>No athletes have been registered yet.</p>
+            <p class="hint">Use the creation form or load curated sample athletes to populate the roster.</p>
+          </div>
+
+          <ul id="athletes-list" class="card-list" aria-live="polite"></ul>
+        </section>
+
+        <section class="panel" aria-labelledby="events-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="events-title">Events</h2>
+              <p class="panel-subtitle">Track the latest competitions from Atlanta to Buenos Aires.</p>
+            </div>
+            <button id="seed-events" class="secondary" type="button">Reload Sample Events</button>
+          </div>
+
+          <details class="form-accordion">
+            <summary>Schedule a new meet</summary>
+            <form id="event-form" class="form">
+              <div class="form-grid">
+                <label>
+                  Name
+                  <input type="text" name="name" placeholder="Summer Invitational" required />
+                </label>
+                <label>
+                  Location
+                  <input type="text" name="location" placeholder="Lisbon, Portugal" required />
+                </label>
+                <label>
+                  Start date
+                  <input type="date" name="start_date" required />
+                </label>
+                <label>
+                  End date
+                  <input type="date" name="end_date" required />
+                </label>
+                <label>
+                  Federation ID
+                  <input type="number" name="federation_id" min="1" step="1" placeholder="Optional" />
+                </label>
+              </div>
+              <button type="submit" class="primary">Create event</button>
+            </form>
+          </details>
+
+          <div id="events-empty" class="empty-state" hidden>
+            <p>No events have been scheduled yet.</p>
+            <p class="hint">Use the meet form or reload the curated calendar of sample events.</p>
+          </div>
+
+          <ul id="events-list" class="card-list" aria-live="polite"></ul>
+        </section>
+
+        <section class="panel" aria-labelledby="rosters-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="rosters-title">Rosters</h2>
+              <p class="panel-subtitle">Keep squads aligned with verified athlete eligibility.</p>
+            </div>
+          </div>
+
+          <div id="rosters-empty" class="empty-state" hidden>
+            <p>No rosters available yet.</p>
+            <p class="hint">Federations upload rosters directly for instant publication.</p>
+          </div>
+
+          <ul id="rosters-list" class="card-list" aria-live="polite"></ul>
+        </section>
+
+        <section class="panel" aria-labelledby="news-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="news-title">News</h2>
+              <p class="panel-subtitle">Bilingual coverage powered by Trackeo correspondents and partners.</p>
+            </div>
+          </div>
+
+          <div id="news-empty" class="empty-state" hidden>
+            <p>No news stories have been published yet.</p>
+            <p class="hint">Follow Trackeo Insights for the latest headlines.</p>
+          </div>
+
+          <ul id="news-list" class="card-list" aria-live="polite"></ul>
+        </section>
+
+        <section id="premium" class="panel panel-wide premium-panel" aria-labelledby="premium-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="premium-title">Coach &amp; Federation tiers</h2>
+              <p class="panel-subtitle">Unlock deep analytics, heat maps, and race video archives tailored to your role.</p>
+            </div>
+            <button class="primary" type="button">Compare plans</button>
+          </div>
+          <div class="premium-grid">
+            <article class="tier-card">
+              <h3>Guest</h3>
+              <p class="tier-price">Free</p>
+              <ul class="benefit-list">
+                <li>Open event calendar</li>
+                <li>Headline stats and news highlights</li>
+                <li>Regional localization (ES/PT)</li>
+              </ul>
+            </article>
+            <article class="tier-card">
+              <h3>Premium</h3>
+              <p class="tier-price">$9 / month</p>
+              <ul class="benefit-list">
+                <li>Full athlete history &amp; season analytics</li>
+                <li>Video library with race markers</li>
+                <li>Priority support in English &amp; Spanish</li>
+              </ul>
+            </article>
+            <article class="tier-card">
+              <h3>Coach</h3>
+              <p class="tier-price">$29 / month</p>
+              <ul class="benefit-list">
+                <li>Roster syncing with federation data</li>
+                <li>Practice planning &amp; workload insights</li>
+                <li>Invite athletes and manage staff</li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section id="federations" class="panel panel-wide trust-panel" aria-labelledby="federations-title">
+          <div class="panel-header">
+            <div>
+              <h2 id="federations-title">Federations upload securely</h2>
+              <p class="panel-subtitle">Trusted partners share verified performances through Trackeo's ingestion APIs.</p>
+            </div>
+            <button class="ghost" type="button">Submit official results</button>
+          </div>
+          <div class="trust-grid">
+            <article>
+              <h3>Verified pipelines</h3>
+              <p>Encrypted submissions with audit trails ensure accuracy before publishing.</p>
+            </article>
+            <article>
+              <h3>Localized infrastructure</h3>
+              <p>Edge nodes in São Paulo, Bogotá, and Santiago reduce upload latency.</p>
+            </article>
+            <article>
+              <h3>Atlanta operations</h3>
+              <p>On-the-ground support from Trackeo HQ keeps every federation onboarding smooth.</p>
+            </article>
+          </div>
+        </section>
       </section>
     </main>
 
     <aside id="notifications" class="notifications" role="status" aria-live="assertive"></aside>
 
     <footer class="app-footer">
-      <p>
-        Powered by FastAPI · API base: <code id="api-base">/api/v1</code>
-      </p>
+      <p>Trackeo · Powered by FastAPI · API base: <code id="api-base">/api/v1</code></p>
+      <p>Headquartered in Atlanta, GA · Scaling across South America with localized partners.</p>
     </footer>
 
     <script src="/static/app.js" type="module"></script>
