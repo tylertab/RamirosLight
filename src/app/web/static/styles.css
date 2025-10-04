@@ -789,3 +789,39 @@ code {
     flex: 1 1 auto;
   }
 }
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.timeline li {
+  border-left: 2px solid rgba(148, 163, 184, 0.35);
+  padding-left: 1rem;
+  margin-left: 0.5rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.definition-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.definition-list div {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 1rem;
+}
+
+.definition-list dt {
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.definition-list dd {
+  margin: 0;
+}

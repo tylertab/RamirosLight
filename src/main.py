@@ -43,11 +43,18 @@ def create_app() -> FastAPI:
         application.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     def _template_response(
-        request: Request, template_name: str, *, page_id: str, fallback_markup: str
+        request: Request,
+        template_name: str,
+        *,
+        page_id: str,
+        fallback_markup: str,
+        context: dict[str, object] | None = None,
     ) -> HTMLResponse:
         if templates is not None:
-            context = {"request": request, "page_id": page_id}
-            return templates.TemplateResponse(template_name, context)
+            template_context: dict[str, object] = {"request": request, "page_id": page_id}
+            if context:
+                template_context.update(context)
+            return templates.TemplateResponse(template_name, template_context)
         return HTMLResponse(content=fallback_markup)
 
     @application.get("/", response_class=HTMLResponse)
@@ -68,6 +75,16 @@ def create_app() -> FastAPI:
             fallback_markup="<h1>Profiles</h1>",
         )
 
+    @application.get("/athletes/{athlete_id}", response_class=HTMLResponse)
+    async def render_athlete_detail(request: Request, athlete_id: int) -> HTMLResponse:
+        return _template_response(
+            request,
+            "athlete_detail.html",
+            page_id="athlete-detail",
+            fallback_markup=f"<h1>Athlete #{athlete_id}</h1>",
+            context={"athlete_id": athlete_id},
+        )
+
     @application.get("/events", response_class=HTMLResponse)
     async def render_events_page(request: Request) -> HTMLResponse:
         return _template_response(
@@ -84,6 +101,16 @@ def create_app() -> FastAPI:
             "rosters.html",
             page_id="rosters",
             fallback_markup="<h1>Rosters</h1>",
+        )
+
+    @application.get("/rosters/{roster_id}", response_class=HTMLResponse)
+    async def render_roster_detail(request: Request, roster_id: int) -> HTMLResponse:
+        return _template_response(
+            request,
+            "roster_detail.html",
+            page_id="roster-detail",
+            fallback_markup=f"<h1>Roster #{roster_id}</h1>",
+            context={"roster_id": roster_id},
         )
 
     @application.get("/login", response_class=HTMLResponse)

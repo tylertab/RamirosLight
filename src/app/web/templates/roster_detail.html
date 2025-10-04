@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Roster overview – Trackeo{% endblock %}
+
+{% block content %}
+  <section class="page-hero" id="roster-detail" data-roster-id="{{ roster_id }}">
+    <div>
+      <h1 id="roster-name">Loading roster…</h1>
+      <p id="roster-subtitle" class="panel-subtitle"></p>
+    </div>
+    <div class="page-actions">
+      <a class="ghost" id="roster-owner" href="#">Owner details</a>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Roster summary</h2>
+        <p class="panel-subtitle">Key details published by federation administrators.</p>
+      </div>
+    </div>
+    <dl class="definition-list" id="roster-summary">
+      <div>
+        <dt>Division</dt>
+        <dd id="roster-division">—</dd>
+      </div>
+      <div>
+        <dt>Coach</dt>
+        <dd id="roster-coach">—</dd>
+      </div>
+      <div>
+        <dt>Updated</dt>
+        <dd id="roster-updated">—</dd>
+      </div>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div>
+        <h2>Athletes</h2>
+        <p class="panel-subtitle">Linked Trackeo profiles</p>
+      </div>
+    </div>
+    <ul id="roster-athletes" class="card-list"></ul>
+    <div id="roster-athletes-empty" class="empty-state" hidden>
+      <p>No athletes have been linked to this roster yet.</p>
+    </div>
+  </section>
+{% endblock %}
