@@ -1,6 +1,6 @@
 from .base import Base
 from .event import Event
-from .federation import FederationSubmission
+from .federation import Federation, FederationSubmission
 from .user import User
 
-__all__ = ["Base", "Event", "FederationSubmission", "User"]
+__all__ = ["Base", "Event", "Federation", "FederationSubmission", "User"]

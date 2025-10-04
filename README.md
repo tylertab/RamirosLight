@@ -14,16 +14,14 @@ A modular FastAPI backend that powers a South America-wide athletics portal. The
 - Git
 
 ## Getting Started
-1. **Install dependencies**
+1. **Run the quick setup script** – automates virtualenv creation, dependency installation, `.env` generation, and database bootstrapping. Override defaults with `PYTHON_BIN`, `VENV_PATH`, or `REQUIREMENTS_FILE` as needed.
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   pip install -r requirements.txt
+   ./scripts/dev_setup.sh
    ```
-2. **Bootstrap the database**
-   > The project uses a `src/` layout, so either export `PYTHONPATH=src` once per shell session or prefix commands that import `app.*` modules.
+2. **Activate the virtual environment** (the script creates `.venv` by default)
    ```bash
-   PYTHONPATH=src python -c "import asyncio; from app.core.database import init_models; asyncio.run(init_models())"
+   source .venv/bin/activate
+   export PYTHONPATH=$(pwd)/src
    ```
 3. **Run the API**
    ```bash
