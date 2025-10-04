@@ -6,6 +6,7 @@ from datetime import date, datetime, time, timezone
 
 from sqlalchemy import select
 
+from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
 from app.models import Event, NewsArticle, NewsAudience, Roster, User
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
@@ -113,6 +114,10 @@ SAMPLE_NEWS: list[dict[str, object]] = [
 
 async def seed_initial_data() -> None:
     """Populate the database with demo content if core tables are empty."""
+
+    settings = SettingsSingleton().instance
+    if not settings.seed_demo_data:
+        return
 
     session = DatabaseSessionManager().session()
     try:
