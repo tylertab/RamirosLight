@@ -6,7 +6,7 @@ Standardize how South American track & field federations submit race results and
 ## 1. Submission Channels
 - **REST API** (`POST /api/v1/federations/submissions`): Preferred for automated feeds.
 - **Signed URL Uploads:** Federations upload CSV/JSON to shared storage (Supabase Storage bucket). Provide signed URL in the API payload.
-- **Manual Upload Form:** Future enhancement using the frontend portal.
+- **Manual Upload Form:** Available at `/federations/upload` in the Trackeo portal. Requires a bearer token generated from the `/login` page (token cached client-side for subsequent submissions).
 
 ## 2. Payload Specification
 ```json
@@ -24,11 +24,11 @@ Standardize how South American track & field federations submit race results and
 3. Confirm `contact_email` matches registered federation account.
 
 ## 4. Processing Workflow
-1. API stores submission in `federation_submissions` table with status `queued`.
+1. Web form or API call stores submission in `federation_submissions` table with status `queued`.
 2. `MessageBus` publishes event `federation.submission` with submission ID.
 3. Background worker (future Celery/RQ task) pulls payload, validates schema, and normalizes units.
 4. Persist cleaned results to `performances` tables and update leaderboards.
-5. Set submission status to `processed` or `failed` with diagnostic notes.
+5. Set submission status to `processed` or `failed` with diagnostic notes. Web view polls `/api/v1/federations/submissions` to display statuses once a valid token is provided.
 
 ## 5. Manual Intervention
 - Operations team monitors new submissions via admin dashboard (to be built).
