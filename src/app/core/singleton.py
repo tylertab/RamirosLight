@@ -19,6 +19,7 @@ class SingletonMeta(type):
 
 
 class ResettableSingletonMeta(SingletonMeta):
+    @classmethod
     def reset_instance(cls) -> None:  # type: ignore[override]
         with cls._lock:
             cls._instances.pop(cls, None)

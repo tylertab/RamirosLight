@@ -1,11 +1,14 @@
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from app.models.federation import FederationSubmissionStatus
+from app.schemas.user import EmailField
 
 
 class FederationSubmissionBase(BaseModel):
     federation_name: str = Field(..., min_length=3, max_length=120)
-    contact_email: str = Field(..., min_length=5, max_length=120)
+    contact_email: EmailField
     payload_url: str = Field(..., description="Public or signed URL where the result file can be fetched")
     notes: str | None = Field(default=None, max_length=500)
 
@@ -16,8 +19,10 @@ class FederationSubmissionCreate(FederationSubmissionBase):
 
 class FederationSubmissionRead(FederationSubmissionBase):
     id: int
-    status: str
-    submitted_at: datetime
+    status: FederationSubmissionStatus
+    submitted_at: datetime = Field(alias="created_at")
+    processed_at: datetime | None = None
+    verified_at: datetime | None = None
+    status_details: str | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(populate_by_name=True, from_attributes=True)

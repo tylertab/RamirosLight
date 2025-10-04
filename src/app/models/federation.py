@@ -1,4 +1,9 @@
-from sqlalchemy import String
+from __future__ import annotations
+
+from datetime import datetime
+from enum import Enum
+
+from sqlalchemy import DateTime, Enum as SqlEnum, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -13,6 +18,13 @@ class Federation(Base):
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
 
+class FederationSubmissionStatus(str, Enum):
+    QUEUED = "queued"
+    PROCESSING = "processing"
+    PROCESSED = "processed"
+    FAILED = "failed"
+
+
 class FederationSubmission(Base):
     __tablename__ = "federation_submissions"
 
@@ -21,4 +33,12 @@ class FederationSubmission(Base):
     contact_email: Mapped[str] = mapped_column(String(255), nullable=False)
     payload_url: Mapped[str] = mapped_column(String(500), nullable=False)
     notes: Mapped[str | None] = mapped_column(String(500), nullable=True)
-    status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    status: Mapped[FederationSubmissionStatus] = mapped_column(
+        SqlEnum(FederationSubmissionStatus, native_enum=False, length=20),
+        nullable=False,
+        default=FederationSubmissionStatus.QUEUED,
+    )
+    status_details: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    checksum: Mapped[str | None] = mapped_column(String(128), nullable=True)
