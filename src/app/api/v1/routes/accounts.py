@@ -17,6 +17,11 @@ async def register_user(
     return user
 
 
+@router.get("/", response_model=list[UserRead])
+async def list_users(service: AccountsService = Depends(get_accounts_service)) -> list[UserRead]:
+    return await service.list_users()
+
+
 @router.get("/{user_id}", response_model=UserRead)
 async def get_user(
     user_id: int, service: AccountsService = Depends(get_accounts_service)

@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from pathlib import Path
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
@@ -11,6 +12,12 @@ from .singleton import SingletonMeta
 class DatabaseSessionManager(metaclass=SingletonMeta):
     def __init__(self) -> None:
         settings = SettingsSingleton().instance
+
+        if settings.database_url.startswith("sqlite"):
+            db_path = settings.database_url.split("///")[-1]
+            if db_path and db_path != ":memory:":
+                Path(db_path).parent.mkdir(parents=True, exist_ok=True)
+
         self._engine = create_async_engine(settings.database_url, echo=False, future=True)
         self._session_factory = async_sessionmaker(self._engine, expire_on_commit=False)
 
@@ -26,8 +33,6 @@ async def init_models() -> None:
     settings = SettingsSingleton().instance
     if settings.database_url.startswith("sqlite"):
         # sqlite needs to ensure directory exists
-        from pathlib import Path
-
         db_path = settings.database_url.split("///")[-1]
         Path(db_path).parent.mkdir(parents=True, exist_ok=True)
 
