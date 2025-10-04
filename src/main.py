@@ -18,6 +18,7 @@ from app.api.v1.routes import (
 )
 from app.core.config import SettingsSingleton
 from app.core.database import init_models
+from app.services.bootstrap import seed_initial_data
 
 
 def create_app() -> FastAPI:
@@ -174,6 +175,7 @@ def create_app() -> FastAPI:
     @application.on_event("startup")
     async def _create_tables() -> None:
         await init_models()
+        await seed_initial_data()
 
     return application
 
