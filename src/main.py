@@ -15,14 +15,28 @@ def create_app() -> FastAPI:
     application = FastAPI(title=settings.project_name, version="1.0.0")
 
     base_dir = Path(__file__).resolve().parent
-    templates = Jinja2Templates(directory=str(base_dir / "app" / "web" / "templates"))
+    template_dir = base_dir / "app" / "web" / "templates"
+    templates = None
+    index_markup = ""
+    try:
+        templates = Jinja2Templates(directory=str(template_dir))
+    except AssertionError:
+        templates = None
+    if not templates and template_dir.exists():
+        index_path = template_dir / "index.html"
+        if index_path.exists():
+            index_markup = index_path.read_text(encoding="utf-8")
+    if not index_markup:
+        index_markup = "<h1>Trackeo</h1>"
     static_dir = base_dir / "app" / "web" / "static"
     if static_dir.exists():
         application.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
     @application.get("/", response_class=HTMLResponse)
     async def render_index(request: Request) -> HTMLResponse:
-        return templates.TemplateResponse("index.html", {"request": request})
+        if templates is not None:
+            return templates.TemplateResponse("index.html", {"request": request})
+        return HTMLResponse(content=index_markup)
 
     application.include_router(health.router, prefix=settings.api_v1_prefix)
     application.include_router(accounts.router, prefix=settings.api_v1_prefix)
