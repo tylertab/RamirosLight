@@ -72,6 +72,9 @@ class DatabaseSchemaManager:
 
         required_columns = {
             "status_details": "VARCHAR(500)",
+            "processed_at": "TIMESTAMP",
+            "verified_at": "TIMESTAMP",
+            "checksum": "VARCHAR(128)",
         }
 
         for column_name, ddl in required_columns.items():
