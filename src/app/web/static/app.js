@@ -18,7 +18,7 @@ const notificationsElement = document.querySelector("#notifications");
 const notify = createNotifier(notificationsElement);
 const localeSwitcher = document.querySelector("#locale-switcher");
 const headerLoginButton = document.querySelector("#header-login");
-const headerSignupButton = document.querySelector("#header-signup");
+const headerEmailButton = document.querySelector("#header-email");
 const apiBaseLabel = document.querySelector("#api-base");
 
 if (apiBaseLabel) {
@@ -59,37 +59,11 @@ if (headerLoginButton) {
   });
 }
 
-if (headerSignupButton) {
-  headerSignupButton.addEventListener("click", () => {
-    window.location.href = "/signup";
-  });
-}
-
-const homeFederationButton = document.querySelector("#home-federation-upload");
-if (homeFederationButton) {
-  homeFederationButton.addEventListener("click", () => {
-    window.location.href = "/federations/upload";
-  });
-}
-
-const heroExploreButton = document.querySelector("#hero-explore");
-const heroSubscribeButton = document.querySelector("#hero-subscribe");
-const searchSection = document.querySelector("#search");
-const premiumSection = document.querySelector("#premium");
-
-if (heroExploreButton && searchSection) {
-  heroExploreButton.addEventListener("click", () => {
-    searchSection.scrollIntoView({ behavior: "smooth", block: "center" });
-    const searchInput = document.querySelector("#global-search");
-    if (searchInput) {
-      searchInput.focus({ preventScroll: true });
+if (headerEmailButton) {
+  headerEmailButton.addEventListener("click", () => {
+    if (pageId !== "home") {
+      window.location.href = "/#hero";
     }
-  });
-}
-
-if (heroSubscribeButton && premiumSection) {
-  heroSubscribeButton.addEventListener("click", () => {
-    premiumSection.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 }
 

@@ -70,6 +70,11 @@ main {
   gap: 0.75rem;
 }
 
+.header-note {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
 .logo {
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -157,10 +162,37 @@ main {
 .hero-cta {
   display: inline-flex;
   gap: 1rem;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 .hero-preview {
   justify-self: end;
+}
+
+.hero-email {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 520px;
+}
+
+.hero-email input {
+  flex: 1 1 220px;
+  min-width: 220px;
+}
+
+.hero-email .hero-cta {
+  align-items: center;
+}
+
+.hero-email .hero-cta button {
+  flex: 0 0 auto;
+}
+
+.hero-hint {
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 
 .preview-card {
@@ -490,6 +522,16 @@ select:focus {
   gap: 0.75rem;
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+.medalist-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+  color: var(--muted);
+  font-size: 0.95rem;
 }
 
 .event-summary {
