@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.core.database import DatabaseSessionManager
 from app.domain import SubscriptionTier
+from app.models import Event, EventDiscipline, EventEntry, Federation, Roster
 from app.schemas.event import (
     EventDetailRead,
     EventDisciplineRead,
@@ -19,38 +22,16 @@ from app.schemas.event import (
     EventSessionRead,
     EventSessionStatus,
 )
-from app.schemas.home import HomeSnapshot
+from app.schemas.home import HomeClub, HomeFederation, HomeResult, HomeSnapshot
 from app.schemas.news import NewsRead
-from app.schemas.roster import RosterRead
-from app.schemas.user import UserRead
-from app.services.accounts import AccountsService
 from app.services.bootstrap import (
     SAMPLE_EVENTS,
+    SAMPLE_FEDERATIONS,
     SAMPLE_NEWS,
-    SAMPLE_ROSTERS,
-    SAMPLE_USERS,
+    SAMPLE_RECENT_RESULTS,
 )
 from app.services.events import EventsService
 from app.services.news import NewsService
-from app.services.rosters import RostersService
-
-
-def _fallback_athletes() -> list[UserRead]:
-    now = datetime.now(tz=timezone.utc)
-    base_started = now - timedelta(days=3)
-    return [
-        UserRead(
-            id=index,
-            email=item["email"],
-            full_name=item["full_name"],
-            role=item["role"],
-            subscription_tier=SubscriptionTier.FREE,
-            created_at=now - timedelta(days=index),
-            subscription_started_at=base_started,
-            subscription_expires_at=base_started + timedelta(days=30),
-        )
-        for index, item in enumerate(SAMPLE_USERS, start=1)
-    ]
 
 
 def _fallback_events() -> list[EventRead]:
@@ -67,19 +48,53 @@ def _fallback_events() -> list[EventRead]:
     ]
 
 
-def _fallback_rosters() -> list[RosterRead]:
+def _fallback_federations() -> list[HomeFederation]:
+    federations: list[HomeFederation] = []
+    for index, item in enumerate(SAMPLE_FEDERATIONS, start=1):
+        clubs = [
+            HomeClub(
+                id=index * 100 + club_index,
+                name=club["name"],
+                country=club.get("country"),
+                division=club.get("division"),
+                coach_name=club.get("coach_name"),
+                athlete_count=club.get("athlete_count"),
+            )
+            for club_index, club in enumerate(item.get("clubs", []), start=1)
+        ]
+        federations.append(
+            HomeFederation(
+                id=index,
+                name=item["name"],
+                country=item.get("country"),
+                website=item.get("website"),
+                clubs=clubs,
+            )
+        )
+    return federations
+
+
+def _fallback_recent_results() -> list[HomeResult]:
     now = datetime.now(tz=timezone.utc)
     return [
-        RosterRead(
-            id=index,
-            name=item["name"],
-            country=item["country"],
-            division=item["division"],
-            coach_name=item["coach_name"],
-            athlete_count=item.get("athlete_count", 0),
-            updated_at=now - timedelta(days=index),
+        HomeResult(
+            entry_id=index,
+            event_id=result["event_id"],
+            event_name=result["event_name"],
+            discipline_id=result["discipline_id"],
+            discipline_name=result["discipline_name"],
+            athlete_name=result["athlete_name"],
+            team_name=result.get("team_name"),
+            position=result.get("position"),
+            result=result.get("result"),
+            points=result.get("points"),
+            roster_id=result.get("roster_id"),
+            roster_name=result.get("roster_name"),
+            federation_id=result.get("federation_id"),
+            federation_name=result.get("federation_name"),
+            updated_at=now - timedelta(minutes=index * 5),
         )
-        for index, item in enumerate(SAMPLE_ROSTERS, start=1)
+        for index, result in enumerate(SAMPLE_RECENT_RESULTS, start=1)
     ]
 
 
@@ -306,16 +321,111 @@ def _ensure_list(value: Iterable) -> list:
 
 async def get_home_snapshot() -> HomeSnapshot:
     session = DatabaseSessionManager().session()
+    federations: list[HomeFederation] = []
+    recent_results: list[HomeResult] = []
     try:
-        accounts_service = AccountsService(session)
         events_service = EventsService(session)
-        rosters_service = RostersService(session)
         news_service = NewsService(session)
 
-        athletes = await accounts_service.list_users()
         events = await events_service.list_events()
-        rosters = await rosters_service.list_rosters()
         news = await news_service.list_articles(SubscriptionTier.FREE)
+
+        federations_result = await session.execute(select(Federation))
+        federation_entities = federations_result.scalars().all()
+
+        club_rows = await session.execute(
+            select(
+                Federation.id.label("federation_id"),
+                Roster.id.label("roster_id"),
+                Roster.name.label("roster_name"),
+                Roster.country,
+                Roster.division,
+                Roster.coach_name,
+                Roster.athlete_count,
+                EventEntry.team_name,
+            )
+            .select_from(EventEntry)
+            .join(EventDiscipline, EventEntry.discipline_id == EventDiscipline.id)
+            .join(Event, EventDiscipline.event_id == Event.id)
+            .join(Federation, Event.federation_id == Federation.id)
+            .outerjoin(Roster, EventEntry.roster_id == Roster.id)
+        )
+
+        clubs_by_federation: dict[int, dict[int | str, HomeClub]] = defaultdict(dict)
+        for row in club_rows:
+            name = row.roster_name or row.team_name
+            if not name:
+                continue
+            key = row.roster_id or name
+            if key in clubs_by_federation[row.federation_id]:
+                continue
+            clubs_by_federation[row.federation_id][key] = HomeClub(
+                id=row.roster_id,
+                name=name,
+                country=row.country,
+                division=row.division,
+                coach_name=row.coach_name,
+                athlete_count=row.athlete_count,
+            )
+
+        federations = [
+            HomeFederation(
+                id=federation.id,
+                name=federation.name,
+                country=federation.country,
+                website=federation.website,
+                clubs=list(clubs_by_federation.get(federation.id, {}).values()),
+            )
+            for federation in federation_entities
+        ]
+
+        recent_rows = await session.execute(
+            select(
+                EventEntry.id.label("entry_id"),
+                EventEntry.updated_at,
+                EventEntry.athlete_name,
+                EventEntry.team_name,
+                EventEntry.position,
+                EventEntry.result,
+                EventEntry.points,
+                Event.id.label("event_id"),
+                Event.name.label("event_name"),
+                EventDiscipline.id.label("discipline_id"),
+                EventDiscipline.name.label("discipline_name"),
+                Federation.id.label("federation_id"),
+                Federation.name.label("federation_name"),
+                Roster.id.label("roster_id"),
+                Roster.name.label("roster_name"),
+            )
+            .select_from(EventEntry)
+            .join(EventDiscipline, EventEntry.discipline_id == EventDiscipline.id)
+            .join(Event, EventDiscipline.event_id == Event.id)
+            .outerjoin(Federation, Event.federation_id == Federation.id)
+            .outerjoin(Roster, EventEntry.roster_id == Roster.id)
+            .order_by(EventEntry.updated_at.desc())
+            .limit(12)
+        )
+
+        recent_results = [
+            HomeResult(
+                entry_id=row.entry_id,
+                event_id=row.event_id,
+                event_name=row.event_name,
+                discipline_id=row.discipline_id,
+                discipline_name=row.discipline_name,
+                athlete_name=row.athlete_name,
+                team_name=row.team_name,
+                position=row.position,
+                result=row.result,
+                points=row.points,
+                roster_id=row.roster_id,
+                roster_name=row.roster_name or row.team_name,
+                federation_id=row.federation_id,
+                federation_name=row.federation_name,
+                updated_at=row.updated_at,
+            )
+            for row in recent_rows
+        ]
 
         live_event: EventDetailRead | None = None
         for event in events:
@@ -329,9 +439,9 @@ async def get_home_snapshot() -> HomeSnapshot:
     finally:
         await session.close()
 
-    athletes_list = _ensure_list(athletes) or _fallback_athletes()
     events_list = _ensure_list(events) or _fallback_events()
-    rosters_list = _ensure_list(rosters) or _fallback_rosters()
+    federations_list = federations or _fallback_federations()
+    results_list = _ensure_list(recent_results) or _fallback_recent_results()
     news_list = _ensure_list(news) or _fallback_news()
 
     if live_event is None:
@@ -339,9 +449,9 @@ async def get_home_snapshot() -> HomeSnapshot:
         live_event = _fallback_event_detail(first_event_id)
 
     return HomeSnapshot(
-        athletes=athletes_list,
+        federations=federations_list,
         events=events_list,
-        rosters=rosters_list,
+        recent_results=results_list,
         news=news_list,
         live_event=live_event,
     )

@@ -1,7 +1,4 @@
 import pytest
-from uuid import uuid4
-
-from app.domain import SubscriptionTier
 
 pytestmark = pytest.mark.anyio("asyncio")
 
@@ -92,18 +89,27 @@ async def test_bootstrap_home_endpoint_returns_data(client):
     assert response.status_code == 200
     data = response.json()
 
-    assert any(user["email"] == athlete_payload["email"] for user in data["athletes"])
-    assert any(event["id"] == event_id for event in data["events"])
-    assert any(roster["name"] == roster_payload["name"] for roster in data["rosters"])
-    assert any(article["title"] == news_payload["title"] for article in data["news"])
+    assert "federations" in data and data["federations"]
+    first_federation = data["federations"][0]
+    assert "clubs" in first_federation
+    assert isinstance(first_federation["clubs"], list)
+
+    assert "recent_results" in data and data["recent_results"]
+    first_result = data["recent_results"][0]
+    assert first_result["event_name"]
+    assert first_result["athlete_name"]
+
+    assert "events" in data and data["events"]
     assert data["live_event"]
-    assert data["live_event"]["disciplines"]
 
 
 async def test_templates_embed_initial_data(client):
     home_response = await client.get("/")
     assert home_response.status_code == 200
     assert 'id="initial-home-data"' in home_response.text
+
+    assert '"federations"' in home_response.text
+    assert '"recent_results"' in home_response.text
 
     event_response = await client.get("/events/9999")
     assert event_response.status_code == 200

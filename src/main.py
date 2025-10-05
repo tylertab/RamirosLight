@@ -76,7 +76,7 @@ def create_app() -> FastAPI:
             page_id="home",
             fallback_markup=index_markup,
             context={
-                "initial_home": home_snapshot.model_dump(mode="json")
+                "initial_home": home_snapshot.model_dump(mode="json", exclude_none=True)
                 if home_snapshot
                 else None,
             },

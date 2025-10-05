@@ -10,28 +10,71 @@ from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
 from app.models import Club, Event, Federation, NewsArticle, NewsAudience, Roster, User
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
-from app.schemas.user import UserCreate
-from app.services.accounts import AccountsService
 from app.services.events import EventsService
 
-SAMPLE_USERS: list[dict[str, str]] = [
+SAMPLE_FEDERATIONS: list[dict[str, object]] = [
     {
-        "full_name": "Ramiro Lightfoot",
-        "email": "ramiro.lightfoot@example.com",
-        "role": "athlete",
-        "password": "Shimmering123",
+        "name": "Federación Atlética Sudamericana",
+        "country": "Argentina",
+        "website": "https://fas.example.org",
+        "clubs": [
+            {
+                "name": "Patagonia Peaks",
+                "country": "Argentina",
+                "division": "Senior",
+                "coach_name": "Lucía Fernández",
+                "athlete_count": 22,
+            },
+            {
+                "name": "Buenos Aires Elite",
+                "country": "Argentina",
+                "division": "Senior",
+                "coach_name": "Mariano Silva",
+                "athlete_count": 18,
+            },
+        ],
     },
     {
-        "full_name": "Sofía Delgado",
-        "email": "sofia.delgado@example.com",
-        "role": "athlete",
-        "password": "Sprinter123",
+        "name": "Confederación Andina de Atletismo",
+        "country": "Ecuador",
+        "website": "https://caa.example.org",
+        "clubs": [
+            {
+                "name": "Andean Flyers",
+                "country": "Ecuador",
+                "division": "U20",
+                "coach_name": "María Torres",
+                "athlete_count": 20,
+            },
+            {
+                "name": "Cusco Distance",
+                "country": "Peru",
+                "division": "Senior",
+                "coach_name": "Renato Medina",
+                "athlete_count": 16,
+            },
+        ],
     },
     {
-        "full_name": "Liam O'Connor",
-        "email": "liam.oconnor@example.com",
-        "role": "athlete",
-        "password": "Hurdles123",
+        "name": "Liga Atlética do Atlântico",
+        "country": "Brazil",
+        "website": "https://laa.example.org",
+        "clubs": [
+            {
+                "name": "São Paulo Relays",
+                "country": "Brazil",
+                "division": "Senior",
+                "coach_name": "João Pereira",
+                "athlete_count": 24,
+            },
+            {
+                "name": "Granada Hurdlers",
+                "country": "Spain",
+                "division": "Senior",
+                "coach_name": "Irene Martínez",
+                "athlete_count": 21,
+            },
+        ],
     },
 ]
 
@@ -78,7 +121,7 @@ SAMPLE_EVENTS: list[dict[str, object]] = [
         "location": "Oslo, Norway",
         "start_date": date(2024, 2, 10),
         "end_date": date(2024, 2, 12),
-        "federation_name": None,
+        "federation": "Confederación Andina de Atletismo",
         "seed_demo": True,
     },
     {
@@ -86,41 +129,59 @@ SAMPLE_EVENTS: list[dict[str, object]] = [
         "location": "Porto, Portugal",
         "start_date": date(2024, 4, 22),
         "end_date": date(2024, 4, 24),
-        "federation_name": "Confederación Sudamericana de Atletismo",
+        "federation": "Liga Atlética do Atlântico",
     },
     {
         "name": "Highlands Distance Festival",
         "location": "Edinburgh, Scotland",
         "start_date": date(2024, 9, 14),
         "end_date": date(2024, 9, 15),
-        "federation_name": None,
+        "federation": "Federación Atlética Sudamericana",
     },
 ]
 
-SAMPLE_ROSTERS: list[dict[str, object]] = [
+SAMPLE_RECENT_RESULTS: list[dict[str, object]] = [
     {
-        "name": "Andino Quito U20",
-        "country": "Ecuador",
-        "division": "U20",
-        "coach_name": "María Torres",
-        "athlete_count": 18,
-        "club_name": "Club Andino Quito",
+        "event_id": 1,
+        "event_name": "Aurora Indoor Classic",
+        "discipline_id": 1,
+        "discipline_name": "100m Final",
+        "athlete_name": "Valentina Ríos",
+        "team_name": "Andean Flyers",
+        "position": 1,
+        "result": "11.32",
+        "points": 12,
+        "federation_id": 2,
+        "federation_name": "Confederación Andina de Atletismo",
+        "roster_name": "Andean Flyers",
     },
     {
-        "name": "São Paulo Relays",
-        "country": "Brazil",
-        "division": "Senior",
-        "coach_name": "João Pereira",
-        "athlete_count": 24,
-        "club_name": "São Paulo Relays",
+        "event_id": 1,
+        "event_name": "Aurora Indoor Classic",
+        "discipline_id": 2,
+        "discipline_name": "Long Jump",
+        "athlete_name": "Renata Gómez",
+        "team_name": "Cusco Distance",
+        "position": 2,
+        "result": "6.48",
+        "points": 9,
+        "federation_id": 2,
+        "federation_name": "Confederación Andina de Atletismo",
+        "roster_name": "Cusco Distance",
     },
     {
-        "name": "Buenos Aires Elite",
-        "country": "Argentina",
-        "division": "Senior",
-        "coach_name": "Lucía Fernández",
-        "athlete_count": 22,
-        "club_name": "Buenos Aires Elite",
+        "event_id": 2,
+        "event_name": "Sunset Coast Invitational",
+        "discipline_id": 3,
+        "discipline_name": "4x400m Relay",
+        "athlete_name": "São Paulo Relays",
+        "team_name": "São Paulo Relays",
+        "position": 1,
+        "result": "3:16.40",
+        "points": 14,
+        "federation_id": 3,
+        "federation_name": "Liga Atlética do Atlântico",
+        "roster_name": "São Paulo Relays",
     },
 ]
 
@@ -158,22 +219,25 @@ async def seed_initial_data() -> None:
 
     session = DatabaseSessionManager().session()
     try:
-        accounts_service = AccountsService(session)
         events_service = EventsService(session)
 
-        user_ids: dict[str, int] = {}
-        for sample in SAMPLE_USERS:
-            existing = await accounts_service.get_user_by_email(sample["email"])
-            if existing is None:
-                created = await accounts_service.create_user(UserCreate(**sample))
-                user_ids[created.email] = created.id
-            else:
-                user_ids[existing.email] = existing.id
-
-        if not user_ids:
-            result = await session.execute(select(User.email, User.id))
-            for email, user_id in result.all():
-                user_ids[email] = user_id
+        federation_ids: dict[str, int] = {}
+        federations_added = False
+        for sample in SAMPLE_FEDERATIONS:
+            result = await session.execute(
+                select(Federation).where(Federation.name == sample["name"])
+            )
+            federation = result.scalar_one_or_none()
+            if federation is None:
+                federation = Federation(
+                    name=sample["name"],
+                    country=sample.get("country"),
+                    website=sample.get("website"),
+                )
+                session.add(federation)
+                await session.flush()
+                federations_added = True
+            federation_ids[federation.name] = federation.id
 
         federation_ids: dict[str, int] = {}
         federations_added = False
@@ -212,20 +276,22 @@ async def seed_initial_data() -> None:
             club_ids[club.name] = club.id
 
         rosters_added = False
-        for sample in SAMPLE_ROSTERS:
-            roster_data = dict(sample)
-            club_name = roster_data.pop("club_name", None)
-            exists = await session.execute(
-                select(Roster.id).where(Roster.name == roster_data["name"])
-            )
-            if exists.scalar_one_or_none() is not None:
-                continue
-            roster = Roster(
-                **roster_data,
-                club_id=club_ids.get(club_name),
-            )
-            session.add(roster)
-            rosters_added = True
+        for federation in SAMPLE_FEDERATIONS:
+            for club in federation.get("clubs", []):
+                exists = await session.execute(
+                    select(Roster.id).where(Roster.name == club["name"])
+                )
+                if exists.scalar_one_or_none() is not None:
+                    continue
+                roster = Roster(
+                    name=club["name"],
+                    country=club.get("country", federation.get("country") or ""),
+                    division=club.get("division", "Senior"),
+                    coach_name=club.get("coach_name", "Trackeo Coach"),
+                    athlete_count=club.get("athlete_count", 0),
+                )
+                session.add(roster)
+                rosters_added = True
 
         events_seeded = False
         for sample in SAMPLE_EVENTS:
