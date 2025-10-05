@@ -4,10 +4,6 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from app.schemas.athlete import AthleteSummary
-from app.schemas.user import UserRead
-
-
 class RosterBase(BaseModel):
     name: str = Field(..., min_length=3, max_length=150)
     country: str = Field(..., min_length=2, max_length=80)
@@ -17,11 +13,13 @@ class RosterBase(BaseModel):
 
 
 class RosterCreate(RosterBase):
-    pass
+    club_id: int = Field(..., ge=1)
 
 
 class RosterRead(RosterBase):
     id: int
+    club_id: int
+    club_name: str | None = None
     updated_at: datetime
 
     class Config:
@@ -29,5 +27,6 @@ class RosterRead(RosterBase):
 
 
 class RosterDetail(RosterRead):
-    owner: UserRead | None = None
-    athletes: list[AthleteSummary] = Field(default_factory=list)
+    federation_id: int | None = None
+    federation_name: str | None = None
+    club_city: str | None = None

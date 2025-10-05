@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import DatabaseSessionManager, get_session
 from app.integrations.message_bus import MessageBus
-from app.models import FederationSubmission, FederationSubmissionStatus
+from app.models import Federation, FederationSubmission, FederationSubmissionStatus
 from app.schemas.federation import FederationSubmissionCreate, FederationSubmissionRead
 
 
@@ -20,8 +20,11 @@ class FederationIngestionService:
     async def enqueue_submission(
         self, payload: FederationSubmissionCreate
     ) -> FederationSubmissionRead:
-        self._validate_payload(payload)
-        submission = FederationSubmission(**payload.model_dump(), status=FederationSubmissionStatus.QUEUED)
+        federation = await self._validate_payload(payload)
+        submission = FederationSubmission(
+            **payload.model_dump(exclude={"access_token"}),
+            status=FederationSubmissionStatus.QUEUED,
+        )
         self._session.add(submission)
         await self._session.commit()
         await self._session.refresh(submission)
@@ -34,12 +37,28 @@ class FederationIngestionService:
         submissions = result.scalars().all()
         return [FederationSubmissionRead.model_validate(item) for item in submissions]
 
-    def _validate_payload(self, payload: FederationSubmissionCreate) -> None:
+    async def _validate_payload(self, payload: FederationSubmissionCreate) -> Federation:
         parsed = urlparse(payload.payload_url)
         if parsed.scheme not in {"https", "s3"}:
             raise ValueError("Payload URL must be HTTPS or signed storage URL")
         if not parsed.netloc:
             raise ValueError("Payload URL must include a host")
+        token = payload.access_token.strip()
+        if not token:
+            raise ValueError("Federation access token is required")
+
+        result = await self._session.execute(
+            select(Federation).where(Federation.name == payload.federation_name)
+        )
+        federation = result.scalar_one_or_none()
+        if federation is None or not federation.ingest_token_hash:
+            raise ValueError("Federation not registered for secure uploads")
+
+        provided_hash = sha256(token.encode("utf-8")).hexdigest()
+        if provided_hash != federation.ingest_token_hash:
+            raise ValueError("Invalid federation access token")
+
+        return federation
 
 
 async def get_federation_service(

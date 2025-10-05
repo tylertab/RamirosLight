@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.core.authorization import require_feature
-from app.domain import SubscriptionFeature
+from app.core.authorization import get_current_user_with_model
 from app.schemas.athlete import (
     AthleteDetail,
     AthleteHistoryResponse,
@@ -26,7 +25,6 @@ async def read_detail(
 async def read_history(
     athlete_id: int,
     service: AthletesService = Depends(get_athletes_service),
-    _: UserRead = Depends(require_feature(SubscriptionFeature.ATHLETE_HISTORY)),
 ) -> AthleteHistoryResponse:
     return await service.get_history(athlete_id)
 
@@ -35,7 +33,6 @@ async def read_history(
 async def read_profile(
     athlete_id: int,
     service: AthletesService = Depends(get_athletes_service),
-    _: UserRead = Depends(require_feature(SubscriptionFeature.ATHLETE_HISTORY)),
 ) -> AthleteProfileRead:
     return await service.get_profile(athlete_id)
 
@@ -45,6 +42,6 @@ async def update_profile(
     athlete_id: int,
     payload: AthleteProfileUpdate,
     service: AthletesService = Depends(get_athletes_service),
-    _: UserRead = Depends(require_feature(SubscriptionFeature.ROSTER_MANAGEMENT)),
+    _: UserRead = Depends(get_current_user_with_model),
 ) -> AthleteProfileRead:
     return await service.update_profile(athlete_id, payload)

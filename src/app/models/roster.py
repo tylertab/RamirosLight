@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -20,4 +20,6 @@ class Roster(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )
-    owner_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    club_id: Mapped[int] = mapped_column(ForeignKey("clubs.id"), nullable=False, index=True)
+
+    club: Mapped["Club"] = relationship("Club", back_populates="rosters")

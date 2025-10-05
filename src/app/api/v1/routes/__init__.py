@@ -8,7 +8,7 @@ from . import (
     news,
     rosters,
     search,
-    subscriptions,
+    subscribers,
 )
 
 __all__ = [
@@ -21,5 +21,5 @@ __all__ = [
     "news",
     "rosters",
     "search",
-    "subscriptions",
+    "subscribers",
 ]

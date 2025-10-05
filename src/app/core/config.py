@@ -22,12 +22,6 @@ class Settings(BaseSettings):
     secret_key: str = "change-me"
     access_token_expire_minutes: int = 60
     allowed_hosts: list[str] = ["*"]
-    subscription_pricing: dict[str, float] = {
-        "free": 0.0,
-        "premium": 12.0,
-        "coach": 29.0,
-    }
-    subscription_currency: str = "USD"
     seed_demo_data: bool = True
 
     @cached_property

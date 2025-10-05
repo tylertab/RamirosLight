@@ -41,8 +41,3 @@ class RosterRepository(SQLAlchemyRepository[Roster]):
         stmt = select(Roster).order_by(Roster.updated_at.desc())
         result = await self._session.execute(stmt)
         return result.scalars().all()
-
-    async def list_owned_by(self, owner_id: int) -> list[Roster]:
-        stmt = select(Roster).where(Roster.owner_id == owner_id).order_by(Roster.updated_at.desc())
-        result = await self._session.execute(stmt)
-        return result.scalars().all()

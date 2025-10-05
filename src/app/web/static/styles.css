@@ -524,6 +524,12 @@ select:focus {
   font-size: 0.9rem;
 }
 
+.card-footnote {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .medalist-list {
   list-style: none;
   margin: 0;

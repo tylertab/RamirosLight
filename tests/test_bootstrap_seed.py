@@ -30,7 +30,6 @@ async def test_seed_initial_data_populates_demo_records(tmp_path, monkeypatch):
         DatabaseSessionManager.reset_instance()
         SettingsSingleton.reset_instance()
 
-    assert counts["User"] >= 3
     assert counts["Event"] >= 3
     assert counts["Roster"] >= 3
     assert counts["NewsArticle"] >= 3

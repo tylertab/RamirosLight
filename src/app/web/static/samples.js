@@ -51,19 +51,112 @@ export const sampleFederations = [
     id: 1,
     name: "Confederação Brasileira de Atletismo",
     country: "Brazil",
-    clubs: 146,
+    clubs: [
+      {
+        id: 11,
+        name: "São Paulo Relays",
+        city: "São Paulo",
+        country: "Brazil",
+        rosters: [
+          {
+            id: 111,
+            name: "São Paulo Relays Senior",
+            division: "Senior",
+            coach_name: "João Pereira",
+            athlete_count: 24,
+          },
+        ],
+      },
+      {
+        id: 12,
+        name: "Rio Performance Club",
+        city: "Rio de Janeiro",
+        country: "Brazil",
+        rosters: [
+          {
+            id: 121,
+            name: "Rio Performance U20",
+            division: "U20",
+            coach_name: "Renata Souza",
+            athlete_count: 18,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 2,
     name: "Federación Colombiana de Atletismo",
     country: "Colombia",
-    clubs: 78,
+    clubs: [
+      {
+        id: 21,
+        name: "Bogotá Altitude Club",
+        city: "Bogotá",
+        country: "Colombia",
+        rosters: [
+          {
+            id: 211,
+            name: "Bogotá Altitude Elite",
+            division: "Senior",
+            coach_name: "Carolina Ríos",
+            athlete_count: 26,
+          },
+        ],
+      },
+      {
+        id: 22,
+        name: "Medellín Speed Project",
+        city: "Medellín",
+        country: "Colombia",
+        rosters: [
+          {
+            id: 221,
+            name: "Medellín Speed Juniors",
+            division: "U18",
+            coach_name: "Luis Herrera",
+            athlete_count: 20,
+          },
+        ],
+      },
+    ],
   },
   {
     id: 3,
     name: "Federación Atlética de Chile",
     country: "Chile",
-    clubs: 52,
+    clubs: [
+      {
+        id: 31,
+        name: "Santiago Andes Club",
+        city: "Santiago",
+        country: "Chile",
+        rosters: [
+          {
+            id: 311,
+            name: "Santiago Andes Distance",
+            division: "Senior",
+            coach_name: "Valentina Muñoz",
+            athlete_count: 22,
+          },
+        ],
+      },
+      {
+        id: 32,
+        name: "Valparaíso Jumps Academy",
+        city: "Valparaíso",
+        country: "Chile",
+        rosters: [
+          {
+            id: 321,
+            name: "Valparaíso Jumps Elite",
+            division: "Senior",
+            coach_name: "Diego Contreras",
+            athlete_count: 16,
+          },
+        ],
+      },
+    ],
   },
 ];
 
@@ -76,6 +169,7 @@ export const sampleResults = [
       "🥈 Mariana Costa (BRA) – 11.35",
       "🥉 Isabela Queiroz (BRA) – 11.41",
     ],
+    club_name: "Buenos Aires Elite",
   },
   {
     event: "Relays de São Paulo",
@@ -85,6 +179,7 @@ export const sampleResults = [
       "🥈 Bogotá Altitude Club – 3:20.02",
       "🥉 Club Andino Quito – 3:21.88",
     ],
+    club_name: "São Paulo Relays",
   },
   {
     event: "Gran Premio Ciudad de México",
@@ -94,6 +189,7 @@ export const sampleResults = [
       "🥈 Javier Méndez (MEX) – 7.95m",
       "🥉 Mateo Herrera (COL) – 7.88m",
     ],
+    club_name: "Granada Hurdlers",
   },
 ];
 

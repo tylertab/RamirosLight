@@ -8,14 +8,17 @@ from .event import (
     EventSession,
     EventSessionStatus,
 )
+from .club import Club
 from .federation import Federation, FederationSubmission, FederationSubmissionStatus
 from .news import NewsArticle, NewsAudience
 from .roster import Roster
+from .subscriber import EmailSubscriber
 from .user import AthleteProfile, User
 
 __all__ = [
     "AthleteProfile",
     "Base",
+    "Club",
     "Event",
     "EventSession",
     "EventDiscipline",
@@ -29,5 +32,6 @@ __all__ = [
     "NewsArticle",
     "NewsAudience",
     "Roster",
+    "EmailSubscriber",
     "User",
 ]

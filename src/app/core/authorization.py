@@ -2,10 +2,8 @@ from collections.abc import Callable
 
 from fastapi import Depends, HTTPException, status
 
-from app.domain import SubscriptionFeature, SubscriptionTier
 from app.schemas.user import UserRead
 from app.services.accounts import AccountsService, get_accounts_service
-from app.services.subscriptions import SubscriptionService, get_subscription_service
 
 from .security import get_current_user
 
@@ -16,33 +14,6 @@ def require_roles(*roles: str) -> Callable[[UserRead], UserRead]:
     async def _checker(user: UserRead = Depends(get_current_user)) -> UserRead:
         if user.role.lower() not in normalized:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient role")
-        return user
-
-    return _checker
-
-
-def require_subscription(minimum: SubscriptionTier) -> Callable[[UserRead], UserRead]:
-    async def _checker(user: UserRead = Depends(get_current_user)) -> UserRead:
-        if not SubscriptionTier(user.subscription_tier).meets(minimum):
-            raise HTTPException(
-                status_code=status.HTTP_402_PAYMENT_REQUIRED,
-                detail=f"Upgrade to {minimum.value} to access this feature",
-            )
-        return user
-
-    return _checker
-
-
-def require_feature(feature: SubscriptionFeature) -> Callable[[UserRead], UserRead]:
-    async def _checker(
-        user: UserRead = Depends(get_current_user),
-        subscriptions: SubscriptionService = Depends(get_subscription_service),
-    ) -> UserRead:
-        if not subscriptions.user_has_feature(user, feature):
-            raise HTTPException(
-                status_code=status.HTTP_402_PAYMENT_REQUIRED,
-                detail="This feature requires a higher subscription tier",
-            )
         return user
 
     return _checker

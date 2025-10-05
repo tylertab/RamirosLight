@@ -2,16 +2,15 @@
 
 from __future__ import annotations
 
-from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 from fastapi import HTTPException
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from app.core.database import DatabaseSessionManager
-from app.domain import SubscriptionTier
-from app.models import Event, EventDiscipline, EventEntry, Federation, Roster
+from app.models import Club, Event, EventDiscipline, EventEntry, Federation, Roster
 from app.schemas.event import (
     EventDetailRead,
     EventDisciplineRead,
@@ -22,7 +21,7 @@ from app.schemas.event import (
     EventSessionRead,
     EventSessionStatus,
 )
-from app.schemas.home import HomeClub, HomeFederation, HomeResult, HomeSnapshot
+from app.schemas.home import HomeClub, HomeFederation, HomeResult, HomeRoster, HomeSnapshot
 from app.schemas.news import NewsRead
 from app.services.bootstrap import (
     SAMPLE_EVENTS,
@@ -51,17 +50,27 @@ def _fallback_events() -> list[EventRead]:
 def _fallback_federations() -> list[HomeFederation]:
     federations: list[HomeFederation] = []
     for index, item in enumerate(SAMPLE_FEDERATIONS, start=1):
-        clubs = [
-            HomeClub(
-                id=index * 100 + club_index,
-                name=club["name"],
-                country=club.get("country"),
-                division=club.get("division"),
-                coach_name=club.get("coach_name"),
-                athlete_count=club.get("athlete_count"),
+        clubs: list[HomeClub] = []
+        for club_index, club in enumerate(item.get("clubs", []), start=1):
+            rosters = [
+                HomeRoster(
+                    id=index * 1000 + club_index * 10 + roster_index,
+                    name=roster.get("name", club["name"]),
+                    division=roster.get("division"),
+                    coach_name=roster.get("coach_name"),
+                    athlete_count=roster.get("athlete_count"),
+                )
+                for roster_index, roster in enumerate(club.get("rosters", []), start=1)
+            ]
+            clubs.append(
+                HomeClub(
+                    id=index * 100 + club_index,
+                    name=club["name"],
+                    city=club.get("city"),
+                    country=club.get("country"),
+                    rosters=rosters,
+                )
             )
-            for club_index, club in enumerate(item.get("clubs", []), start=1)
-        ]
         federations.append(
             HomeFederation(
                 id=index,
@@ -90,6 +99,8 @@ def _fallback_recent_results() -> list[HomeResult]:
             points=result.get("points"),
             roster_id=result.get("roster_id"),
             roster_name=result.get("roster_name"),
+            club_id=result.get("club_id"),
+            club_name=result.get("club_name"),
             federation_id=result.get("federation_id"),
             federation_name=result.get("federation_name"),
             updated_at=now - timedelta(minutes=index * 5),
@@ -328,56 +339,51 @@ async def get_home_snapshot() -> HomeSnapshot:
         news_service = NewsService(session)
 
         events = await events_service.list_events()
-        news = await news_service.list_articles(SubscriptionTier.FREE)
+        news = await news_service.list_articles()
 
-        federations_result = await session.execute(select(Federation))
-        federation_entities = federations_result.scalars().all()
-
-        club_rows = await session.execute(
-            select(
-                Federation.id.label("federation_id"),
-                Roster.id.label("roster_id"),
-                Roster.name.label("roster_name"),
-                Roster.country,
-                Roster.division,
-                Roster.coach_name,
-                Roster.athlete_count,
-                EventEntry.team_name,
+        federations_result = await session.execute(
+            select(Federation).options(
+                selectinload(Federation.clubs).selectinload(Club.rosters)
             )
-            .select_from(EventEntry)
-            .join(EventDiscipline, EventEntry.discipline_id == EventDiscipline.id)
-            .join(Event, EventDiscipline.event_id == Event.id)
-            .join(Federation, Event.federation_id == Federation.id)
-            .outerjoin(Roster, EventEntry.roster_id == Roster.id)
         )
+        federation_entities = federations_result.scalars().unique().all()
 
-        clubs_by_federation: dict[int, dict[int | str, HomeClub]] = defaultdict(dict)
-        for row in club_rows:
-            name = row.roster_name or row.team_name
-            if not name:
-                continue
-            key = row.roster_id or name
-            if key in clubs_by_federation[row.federation_id]:
-                continue
-            clubs_by_federation[row.federation_id][key] = HomeClub(
-                id=row.roster_id,
-                name=name,
-                country=row.country,
-                division=row.division,
-                coach_name=row.coach_name,
-                athlete_count=row.athlete_count,
-            )
+        federations = []
+        for federation in federation_entities:
+            clubs: list[HomeClub] = []
+            for club in sorted(federation.clubs, key=lambda item: item.name.lower()):
+                rosters = [
+                    HomeRoster(
+                        id=roster.id,
+                        name=roster.name,
+                        division=roster.division,
+                        coach_name=roster.coach_name,
+                        athlete_count=roster.athlete_count,
+                        updated_at=roster.updated_at,
+                    )
+                    for roster in sorted(
+                        club.rosters, key=lambda item: item.updated_at, reverse=True
+                    )
+                ]
+                clubs.append(
+                    HomeClub(
+                        id=club.id,
+                        name=club.name,
+                        city=club.city,
+                        country=club.country,
+                        rosters=rosters,
+                    )
+                )
 
-        federations = [
-            HomeFederation(
-                id=federation.id,
-                name=federation.name,
-                country=federation.country,
-                website=federation.website,
-                clubs=list(clubs_by_federation.get(federation.id, {}).values()),
+            federations.append(
+                HomeFederation(
+                    id=federation.id,
+                    name=federation.name,
+                    country=federation.country,
+                    website=federation.website,
+                    clubs=clubs,
+                )
             )
-            for federation in federation_entities
-        ]
 
         recent_rows = await session.execute(
             select(
@@ -396,12 +402,15 @@ async def get_home_snapshot() -> HomeSnapshot:
                 Federation.name.label("federation_name"),
                 Roster.id.label("roster_id"),
                 Roster.name.label("roster_name"),
+                Club.id.label("club_id"),
+                Club.name.label("club_name"),
             )
             .select_from(EventEntry)
             .join(EventDiscipline, EventEntry.discipline_id == EventDiscipline.id)
             .join(Event, EventDiscipline.event_id == Event.id)
             .outerjoin(Federation, Event.federation_id == Federation.id)
             .outerjoin(Roster, EventEntry.roster_id == Roster.id)
+            .outerjoin(Club, Roster.club_id == Club.id)
             .order_by(EventEntry.updated_at.desc())
             .limit(12)
         )
@@ -420,6 +429,8 @@ async def get_home_snapshot() -> HomeSnapshot:
                 points=row.points,
                 roster_id=row.roster_id,
                 roster_name=row.roster_name or row.team_name,
+                club_id=row.club_id,
+                club_name=row.club_name,
                 federation_id=row.federation_id,
                 federation_name=row.federation_name,
                 updated_at=row.updated_at,

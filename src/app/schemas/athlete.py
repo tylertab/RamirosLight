@@ -3,6 +3,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -59,7 +61,6 @@ class AthleteDetail(BaseModel):
     full_name: str
     email: str
     role: str
-    subscription_tier: str
     created_at: datetime
     updated_at: datetime
     bio: str | None = None

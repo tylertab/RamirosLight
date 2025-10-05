@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, status
 
-from app.core.authorization import require_feature
-from app.domain import SubscriptionFeature
+from app.core.authorization import get_current_user_with_model
 from app.schemas.roster import RosterCreate, RosterDetail, RosterRead
 from app.schemas.user import UserRead
 from app.services.rosters import RostersService, get_rosters_service
@@ -23,6 +22,6 @@ async def read_roster(roster_id: int, service: RostersService = Depends(get_rost
 async def create_roster(
     payload: RosterCreate,
     service: RostersService = Depends(get_rosters_service),
-    current_user: UserRead = Depends(require_feature(SubscriptionFeature.ROSTER_MANAGEMENT)),
+    current_user: UserRead = Depends(get_current_user_with_model),
 ) -> RosterRead:
     return await service.create_roster(payload, owner_id=current_user.id)
