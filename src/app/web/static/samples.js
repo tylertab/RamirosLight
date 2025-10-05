@@ -46,6 +46,57 @@ export const sampleEvents = [
   },
 ];
 
+export const sampleFederations = [
+  {
+    id: 1,
+    name: "Confederação Brasileira de Atletismo",
+    country: "Brazil",
+    clubs: 146,
+  },
+  {
+    id: 2,
+    name: "Federación Colombiana de Atletismo",
+    country: "Colombia",
+    clubs: 78,
+  },
+  {
+    id: 3,
+    name: "Federación Atlética de Chile",
+    country: "Chile",
+    clubs: 52,
+  },
+];
+
+export const sampleResults = [
+  {
+    event: "Campeonato Sudamericano U23",
+    discipline: "100m Final",
+    medalists: [
+      "🥇 Camila Torres (ARG) – 11.28",
+      "🥈 Mariana Costa (BRA) – 11.35",
+      "🥉 Isabela Queiroz (BRA) – 11.41",
+    ],
+  },
+  {
+    event: "Relays de São Paulo",
+    discipline: "4x400m Mixed",
+    medalists: [
+      "🥇 São Paulo Relays – 3:18.44",
+      "🥈 Bogotá Altitude Club – 3:20.02",
+      "🥉 Club Andino Quito – 3:21.88",
+    ],
+  },
+  {
+    event: "Gran Premio Ciudad de México",
+    discipline: "Long Jump Final",
+    medalists: [
+      "🥇 Thiago López (BRA) – 8.08m",
+      "🥈 Javier Méndez (MEX) – 7.95m",
+      "🥉 Mateo Herrera (COL) – 7.88m",
+    ],
+  },
+];
+
 export const sampleRosters = [
   {
     name: "Club Andino Quito",
