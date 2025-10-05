@@ -33,6 +33,12 @@ async def test_bootstrap_home_endpoint_returns_data(client):
         "division": "Senior",
         "coach_name": "Maria Snapshot",
         "athlete_count": 12,
+        "club": {
+            "name": f"Snapshot Athletics {unique}",
+            "city": "La Paz",
+            "country": "Bolivia",
+            "federation_id": None,
+        },
     }
     news_payload = {
         "title": f"Snapshot Club {unique} sets relay record",

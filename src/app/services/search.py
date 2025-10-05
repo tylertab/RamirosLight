@@ -3,10 +3,11 @@ from collections.abc import Iterable
 from fastapi import Depends
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.database import get_session
 from app.domain import SubscriptionTier
-from app.models import Event, NewsArticle, NewsAudience, Roster, User
+from app.models import Club, Event, NewsArticle, NewsAudience, Roster, User
 from app.schemas.search import SearchResponse, SearchResult
 
 
@@ -86,11 +87,14 @@ class SearchService:
     async def _search_rosters(self, query: str) -> list[SearchResult]:
         stmt = (
             select(Roster)
+            .join(Club, isouter=True)
+            .options(selectinload(Roster.club).selectinload(Club.federation))
             .where(
                 or_(
                     Roster.name.ilike(f"%{query}%"),
                     Roster.country.ilike(f"%{query}%"),
                     Roster.coach_name.ilike(f"%{query}%"),
+                    Club.name.ilike(f"%{query}%"),
                 )
             )
             .limit(10)
@@ -101,11 +105,25 @@ class SearchService:
             SearchResult(
                 category="Rosters",
                 title=roster.name,
-                subtitle=f"{roster.country} · {roster.division}",
-                detail=f"{roster.athlete_count} athletes",
+                subtitle=self._format_roster_subtitle(roster),
+                detail=self._format_roster_detail(roster),
             )
             for roster in rosters
         ]
+
+    def _format_roster_subtitle(self, roster: Roster) -> str:
+        if roster.club:
+            segments = [roster.club.name]
+            if roster.club.federation:
+                segments.append(roster.club.federation.name)
+            return " · ".join(segments)
+        return f"{roster.country} · {roster.division}"
+
+    def _format_roster_detail(self, roster: Roster) -> str:
+        base = f"{roster.athlete_count} athletes"
+        if roster.club and roster.club.country:
+            return f"{base} · {roster.club.country}"
+        return base
 
     async def _search_news(self, query: str, tier: SubscriptionTier) -> list[SearchResult]:
         audiences = [NewsAudience.PUBLIC]

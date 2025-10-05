@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.models import AthleteProfile, Roster, User
+from app.models import AthleteProfile, Club, Roster, User
 
 from .base import SQLAlchemyRepository
 
@@ -38,11 +39,31 @@ class RosterRepository(SQLAlchemyRepository[Roster]):
         super().__init__(session, Roster)
 
     async def list_recent(self) -> list[Roster]:
-        stmt = select(Roster).order_by(Roster.updated_at.desc())
+        stmt = (
+            select(Roster)
+            .options(selectinload(Roster.club).selectinload(Club.federation))
+            .order_by(Roster.updated_at.desc())
+        )
         result = await self._session.execute(stmt)
         return result.scalars().all()
 
     async def list_owned_by(self, owner_id: int) -> list[Roster]:
-        stmt = select(Roster).where(Roster.owner_id == owner_id).order_by(Roster.updated_at.desc())
+        stmt = (
+            select(Roster)
+            .join(Club)
+            .options(selectinload(Roster.club).selectinload(Club.federation))
+            .where(Club.manager_id == owner_id)
+            .order_by(Roster.updated_at.desc())
+        )
         result = await self._session.execute(stmt)
         return result.scalars().all()
+
+    async def get_with_associations(self, roster_id: int) -> Roster | None:
+        stmt = (
+            select(Roster)
+            .options(selectinload(Roster.club).selectinload(Club.federation))
+            .options(selectinload(Roster.club).selectinload(Club.manager))
+            .where(Roster.id == roster_id)
+        )
+        result = await self._session.execute(stmt)
+        return result.scalar_one_or_none()

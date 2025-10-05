@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import DateTime, Enum, ForeignKey, JSON, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,6 +9,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.domain import SubscriptionTier
 
 from .base import Base
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .club import Club
 
 
 class User(Base):
@@ -31,6 +35,9 @@ class User(Base):
 
     athlete_profile: Mapped[Optional["AthleteProfile"]] = relationship(
         back_populates="user", cascade="all, delete-orphan", uselist=False
+    )
+    managed_clubs: Mapped[list["Club"]] = relationship(
+        "Club", back_populates="manager"
     )
 
     def activate_subscription(

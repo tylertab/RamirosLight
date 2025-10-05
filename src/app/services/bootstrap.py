@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
-from app.models import Event, NewsArticle, NewsAudience, Roster, User
+from app.models import Club, Event, Federation, NewsArticle, NewsAudience, Roster, User
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
 from app.schemas.user import UserCreate
 from app.services.accounts import AccountsService
@@ -35,13 +35,50 @@ SAMPLE_USERS: list[dict[str, str]] = [
     },
 ]
 
+SAMPLE_FEDERATIONS: list[dict[str, object]] = [
+    {
+        "name": "Confederación Sudamericana de Atletismo",
+        "country": "South America",
+        "website": "https://consudatle.org",
+    },
+    {
+        "name": "Brazilian Athletics Confederation",
+        "country": "Brazil",
+        "website": "https://www.cbat.org.br",
+    },
+]
+
+SAMPLE_CLUBS: list[dict[str, object]] = [
+    {
+        "name": "Club Andino Quito",
+        "city": "Quito",
+        "country": "Ecuador",
+        "federation_name": "Confederación Sudamericana de Atletismo",
+        "manager_email": "ramiro.lightfoot@example.com",
+    },
+    {
+        "name": "São Paulo Relays",
+        "city": "São Paulo",
+        "country": "Brazil",
+        "federation_name": "Brazilian Athletics Confederation",
+        "manager_email": "sofia.delgado@example.com",
+    },
+    {
+        "name": "Buenos Aires Elite",
+        "city": "Buenos Aires",
+        "country": "Argentina",
+        "federation_name": "Confederación Sudamericana de Atletismo",
+        "manager_email": "liam.oconnor@example.com",
+    },
+]
+
 SAMPLE_EVENTS: list[dict[str, object]] = [
     {
         "name": "Aurora Indoor Classic",
         "location": "Oslo, Norway",
         "start_date": date(2024, 2, 10),
         "end_date": date(2024, 2, 12),
-        "federation_id": None,
+        "federation_name": None,
         "seed_demo": True,
     },
     {
@@ -49,25 +86,25 @@ SAMPLE_EVENTS: list[dict[str, object]] = [
         "location": "Porto, Portugal",
         "start_date": date(2024, 4, 22),
         "end_date": date(2024, 4, 24),
-        "federation_id": None,
+        "federation_name": "Confederación Sudamericana de Atletismo",
     },
     {
         "name": "Highlands Distance Festival",
         "location": "Edinburgh, Scotland",
         "start_date": date(2024, 9, 14),
         "end_date": date(2024, 9, 15),
-        "federation_id": None,
+        "federation_name": None,
     },
 ]
 
 SAMPLE_ROSTERS: list[dict[str, object]] = [
     {
-        "name": "Club Andino Quito",
+        "name": "Andino Quito U20",
         "country": "Ecuador",
         "division": "U20",
         "coach_name": "María Torres",
         "athlete_count": 18,
-        "owner_email": "ramiro.lightfoot@example.com",
+        "club_name": "Club Andino Quito",
     },
     {
         "name": "São Paulo Relays",
@@ -75,7 +112,7 @@ SAMPLE_ROSTERS: list[dict[str, object]] = [
         "division": "Senior",
         "coach_name": "João Pereira",
         "athlete_count": 24,
-        "owner_email": "sofia.delgado@example.com",
+        "club_name": "São Paulo Relays",
     },
     {
         "name": "Buenos Aires Elite",
@@ -83,7 +120,7 @@ SAMPLE_ROSTERS: list[dict[str, object]] = [
         "division": "Senior",
         "coach_name": "Lucía Fernández",
         "athlete_count": 22,
-        "owner_email": "liam.oconnor@example.com",
+        "club_name": "Buenos Aires Elite",
     },
 ]
 
@@ -138,17 +175,55 @@ async def seed_initial_data() -> None:
             for email, user_id in result.all():
                 user_ids[email] = user_id
 
+        federation_ids: dict[str, int] = {}
+        federations_added = False
+        for sample in SAMPLE_FEDERATIONS:
+            exists = await session.execute(
+                select(Federation.id).where(Federation.name == sample["name"])
+            )
+            federation_id = exists.scalar_one_or_none()
+            if federation_id is None:
+                federation = Federation(**sample)
+                session.add(federation)
+                await session.flush()
+                federation_ids[sample["name"]] = federation.id
+                federations_added = True
+            else:
+                federation_ids[sample["name"]] = federation_id
+
+        clubs_added = False
+        club_ids: dict[str, int] = {}
+        for sample in SAMPLE_CLUBS:
+            exists = await session.execute(select(Club).where(Club.name == sample["name"]))
+            club = exists.scalar_one_or_none()
+            if club is None:
+                federation_name = sample.get("federation_name")
+                manager_email = sample.get("manager_email")
+                club = Club(
+                    name=sample["name"],
+                    city=sample.get("city"),
+                    country=sample["country"],
+                    federation_id=federation_ids.get(federation_name) if federation_name else None,
+                    manager_id=user_ids.get(manager_email) if manager_email else None,
+                )
+                session.add(club)
+                await session.flush()
+                clubs_added = True
+            club_ids[club.name] = club.id
+
         rosters_added = False
         for sample in SAMPLE_ROSTERS:
             roster_data = dict(sample)
-            owner_email = roster_data.pop("owner_email", None)
-            owner_id = user_ids.get(owner_email) if owner_email else None
+            club_name = roster_data.pop("club_name", None)
             exists = await session.execute(
                 select(Roster.id).where(Roster.name == roster_data["name"])
             )
             if exists.scalar_one_or_none() is not None:
                 continue
-            roster = Roster(owner_id=owner_id, **roster_data)
+            roster = Roster(
+                **roster_data,
+                club_id=club_ids.get(club_name),
+            )
             session.add(roster)
             rosters_added = True
 
@@ -164,7 +239,7 @@ async def seed_initial_data() -> None:
                 location=sample["location"],
                 start_date=sample["start_date"],
                 end_date=sample["end_date"],
-                federation_id=sample.get("federation_id"),
+                federation_id=federation_ids.get(sample.get("federation_name"))
             )
             created = await events_service.create_event(payload)
             events_seeded = True
@@ -203,7 +278,7 @@ async def seed_initial_data() -> None:
             session.add(article)
             news_added = True
 
-        if rosters_added or news_added or events_seeded:
+        if rosters_added or news_added or events_seeded or clubs_added or federations_added:
             await session.commit()
     finally:
         await session.close()

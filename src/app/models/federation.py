@@ -4,9 +4,15 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import DateTime, Enum as SqlEnum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import TYPE_CHECKING
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+
+
+if TYPE_CHECKING:  # pragma: no cover
+    from .club import Club
 
 
 class Federation(Base):
@@ -16,6 +22,10 @@ class Federation(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
     country: Mapped[str | None] = mapped_column(String(80), nullable=True)
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    clubs: Mapped[list["Club"]] = relationship(
+        "Club", back_populates="federation", cascade="all, delete-orphan"
+    )
 
 
 class FederationSubmissionStatus(str, Enum):
