@@ -4,7 +4,7 @@ from datetime import datetime
 from enum import Enum
 
 from sqlalchemy import DateTime, Enum as SqlEnum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -16,6 +16,9 @@ class Federation(Base):
     name: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
     country: Mapped[str | None] = mapped_column(String(80), nullable=True)
     website: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    ingest_token_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+
+    clubs: Mapped[list["Club"]] = relationship("Club", back_populates="federation")
 
 
 class FederationSubmissionStatus(str, Enum):

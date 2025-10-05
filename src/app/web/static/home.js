@@ -1,3 +1,4 @@
+import { request } from "./api.js";
 import { sampleFederations, sampleResults } from "./samples.js";
 import { hydrateHomeState, setFederations, setResults, state } from "./state.js";
 import { translations } from "./translations.js";
@@ -47,18 +48,33 @@ export function initializeHomePage({ initialData, notify }) {
     state.federations.forEach((federation) => {
       const item = document.createElement("li");
       item.className = "card";
-      const clubCountValue =
-        federation.clubs ?? federation.club_count ?? 0;
-      const formattedClubs =
-        typeof clubCountValue === "number"
-          ? clubCountValue.toLocaleString()
-          : clubCountValue;
+      const clubs = Array.isArray(federation.clubs)
+        ? federation.clubs
+        : [];
+      const clubCount = clubs.length;
+      const rosterCount = clubs.reduce((total, club) => {
+        if (!club || !Array.isArray(club.rosters)) {
+          return total;
+        }
+        return total + club.rosters.length;
+      }, 0);
+      const highlightClubs = clubs
+        .slice(0, 3)
+        .map((club) => club.name)
+        .filter(Boolean)
+        .join(", ");
       item.innerHTML = `
         <h3>${federation.name}</h3>
         <div class="card-meta">
-          <span>${translate("home.federations_country")}: ${federation.country}</span>
-          <span>${translate("home.federations_clubs", { count: formattedClubs })}</span>
+          <span>${translate("home.federations_country")}: ${federation.country ?? "–"}</span>
+          <span>${translate("home.federations_clubs", { count: clubCount })}</span>
+          <span>${translate("home.federations_rosters", { count: rosterCount })}</span>
         </div>
+        ${
+          highlightClubs
+            ? `<p class="card-footnote">${highlightClubs}</p>`
+            : ""
+        }
       `;
       federationsList.appendChild(item);
     });
@@ -104,7 +120,7 @@ export function initializeHomePage({ initialData, notify }) {
   window.addEventListener("trackeo:locale-change", renderHome);
 
   if (emailForm && emailInput) {
-    emailForm.addEventListener("submit", (event) => {
+    emailForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!emailForm.reportValidity()) {
         return;
@@ -114,9 +130,23 @@ export function initializeHomePage({ initialData, notify }) {
         notify("error", translate("home.email_error"));
         return;
       }
-      notify("success", translate("home.email_success", { email }));
-      emailInput.value = "";
-      emailInput.focus({ preventScroll: true });
+      try {
+        const locale = document.documentElement.lang || "en";
+        const response = await request("/subscribers", {
+          method: "POST",
+          body: JSON.stringify({ email, locale }),
+        });
+        const confirmedEmail = response?.email || email;
+        notify("success", translate("home.email_success", { email: confirmedEmail }));
+        emailInput.value = "";
+        emailInput.focus({ preventScroll: true });
+      } catch (error) {
+        if (error.status === 409) {
+          notify("info", translate("home.email_duplicate", { email }));
+          return;
+        }
+        notify("error", translate("home.email_failure"));
+      }
     });
   }
 

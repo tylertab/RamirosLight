@@ -88,6 +88,8 @@ export function initializeFederationsUploadPage({ notify }) {
         storeAuthToken(rawToken, new Date(Date.now() + 3600_000).toISOString(), readAuthToken().tier);
       }
       const payload = Object.fromEntries(formData.entries());
+      const cleanedToken = (tokenInput || authHeader)?.toString().replace(/^Bearer\s+/i, "");
+      payload.access_token = cleanedToken;
       delete payload.token;
       try {
         await request("/federations/submissions", {

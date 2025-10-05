@@ -12,6 +12,9 @@ async def test_bootstrap_home_endpoint_returns_data(client):
     first_federation = data["federations"][0]
     assert "clubs" in first_federation
     assert isinstance(first_federation["clubs"], list)
+    first_club = first_federation["clubs"][0]
+    assert "rosters" in first_club
+    assert isinstance(first_club["rosters"], list)
 
     assert "recent_results" in data and data["recent_results"]
     first_result = data["recent_results"][0]

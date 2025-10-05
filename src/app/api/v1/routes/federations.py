@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from fastapi import APIRouter, Depends, HTTPException, status
-
-from app.core.authorization import require_feature, require_roles
-from app.domain import SubscriptionFeature
+from app.core.authorization import require_roles
 from app.schemas.federation import FederationSubmissionCreate, FederationSubmissionRead
-from app.schemas.user import UserRead
 from app.services.federations import FederationIngestionService, get_federation_service
 
 router = APIRouter(prefix="/federations", tags=["federations"])
@@ -19,8 +15,6 @@ router = APIRouter(prefix="/federations", tags=["federations"])
 async def submit_results(
     payload: FederationSubmissionCreate,
     service: FederationIngestionService = Depends(get_federation_service),
-    _: UserRead = Depends(require_roles("federation")),
-    __: UserRead = Depends(require_feature(SubscriptionFeature.FEDERATION_UPLOAD)),
 ) -> FederationSubmissionRead:
     try:
         return await service.enqueue_submission(payload)

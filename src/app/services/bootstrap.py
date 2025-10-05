@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time, timezone
+from hashlib import sha256
 
 from sqlalchemy import select
 
 from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
-from app.models import Event, Federation, NewsArticle, NewsAudience, Roster
+from app.models import Club, Event, Federation, NewsArticle, NewsAudience, Roster
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
 from app.services.events import EventsService
 
@@ -17,20 +18,31 @@ SAMPLE_FEDERATIONS: list[dict[str, object]] = [
         "name": "Federación Atlética Sudamericana",
         "country": "Argentina",
         "website": "https://fas.example.org",
+        "token": "fas-demo-token",
         "clubs": [
             {
                 "name": "Patagonia Peaks",
+                "city": "Bariloche",
                 "country": "Argentina",
-                "division": "Senior",
-                "coach_name": "Lucía Fernández",
-                "athlete_count": 22,
+                "rosters": [
+                    {
+                        "division": "Senior",
+                        "coach_name": "Lucía Fernández",
+                        "athlete_count": 22,
+                    }
+                ],
             },
             {
                 "name": "Buenos Aires Elite",
+                "city": "Buenos Aires",
                 "country": "Argentina",
-                "division": "Senior",
-                "coach_name": "Mariano Silva",
-                "athlete_count": 18,
+                "rosters": [
+                    {
+                        "division": "Senior",
+                        "coach_name": "Mariano Silva",
+                        "athlete_count": 18,
+                    }
+                ],
             },
         ],
     },
@@ -38,20 +50,31 @@ SAMPLE_FEDERATIONS: list[dict[str, object]] = [
         "name": "Confederación Andina de Atletismo",
         "country": "Ecuador",
         "website": "https://caa.example.org",
+        "token": "caa-demo-token",
         "clubs": [
             {
                 "name": "Andean Flyers",
+                "city": "Quito",
                 "country": "Ecuador",
-                "division": "U20",
-                "coach_name": "María Torres",
-                "athlete_count": 20,
+                "rosters": [
+                    {
+                        "division": "U20",
+                        "coach_name": "María Torres",
+                        "athlete_count": 20,
+                    }
+                ],
             },
             {
                 "name": "Cusco Distance",
+                "city": "Cusco",
                 "country": "Peru",
-                "division": "Senior",
-                "coach_name": "Renato Medina",
-                "athlete_count": 16,
+                "rosters": [
+                    {
+                        "division": "Senior",
+                        "coach_name": "Renato Medina",
+                        "athlete_count": 16,
+                    }
+                ],
             },
         ],
     },
@@ -59,20 +82,31 @@ SAMPLE_FEDERATIONS: list[dict[str, object]] = [
         "name": "Liga Atlética do Atlântico",
         "country": "Brazil",
         "website": "https://laa.example.org",
+        "token": "laa-demo-token",
         "clubs": [
             {
                 "name": "São Paulo Relays",
+                "city": "São Paulo",
                 "country": "Brazil",
-                "division": "Senior",
-                "coach_name": "João Pereira",
-                "athlete_count": 24,
+                "rosters": [
+                    {
+                        "division": "Senior",
+                        "coach_name": "João Pereira",
+                        "athlete_count": 24,
+                    }
+                ],
             },
             {
                 "name": "Granada Hurdlers",
+                "city": "Granada",
                 "country": "Spain",
-                "division": "Senior",
-                "coach_name": "Irene Martínez",
-                "athlete_count": 21,
+                "rosters": [
+                    {
+                        "division": "Senior",
+                        "coach_name": "Irene Martínez",
+                        "athlete_count": 21,
+                    }
+                ],
             },
         ],
     },
@@ -117,6 +151,7 @@ SAMPLE_RECENT_RESULTS: list[dict[str, object]] = [
         "federation_id": 2,
         "federation_name": "Confederación Andina de Atletismo",
         "roster_name": "Andean Flyers",
+        "club_name": "Andean Flyers",
     },
     {
         "event_id": 1,
@@ -131,6 +166,7 @@ SAMPLE_RECENT_RESULTS: list[dict[str, object]] = [
         "federation_id": 2,
         "federation_name": "Confederación Andina de Atletismo",
         "roster_name": "Cusco Distance",
+        "club_name": "Cusco Distance",
     },
     {
         "event_id": 2,
@@ -145,6 +181,7 @@ SAMPLE_RECENT_RESULTS: list[dict[str, object]] = [
         "federation_id": 3,
         "federation_name": "Liga Atlética do Atlântico",
         "roster_name": "São Paulo Relays",
+        "club_name": "São Paulo Relays",
     },
 ]
 
@@ -186,6 +223,8 @@ async def seed_initial_data() -> None:
 
         federation_ids: dict[str, int] = {}
         federations_added = False
+        clubs_added = False
+        rosters_added = False
         for sample in SAMPLE_FEDERATIONS:
             result = await session.execute(
                 select(Federation).where(Federation.name == sample["name"])
@@ -196,29 +235,51 @@ async def seed_initial_data() -> None:
                     name=sample["name"],
                     country=sample.get("country"),
                     website=sample.get("website"),
+                    ingest_token_hash=sha256(sample.get("token", "").encode("utf-8")).hexdigest()
+                    if sample.get("token")
+                    else None,
                 )
                 session.add(federation)
                 await session.flush()
                 federations_added = True
+            elif sample.get("token"):
+                federation.ingest_token_hash = sha256(sample["token"].encode("utf-8")).hexdigest()
+                session.add(federation)
             federation_ids[federation.name] = federation.id
 
-        rosters_added = False
-        for federation in SAMPLE_FEDERATIONS:
-            for club in federation.get("clubs", []):
-                exists = await session.execute(
-                    select(Roster.id).where(Roster.name == club["name"])
+            for club_sample in sample.get("clubs", []):
+                club_result = await session.execute(
+                    select(Club).where(Club.name == club_sample["name"])
                 )
-                if exists.scalar_one_or_none() is not None:
-                    continue
-                roster = Roster(
-                    name=club["name"],
-                    country=club.get("country", federation.get("country") or ""),
-                    division=club.get("division", "Senior"),
-                    coach_name=club.get("coach_name", "Trackeo Coach"),
-                    athlete_count=club.get("athlete_count", 0),
-                )
-                session.add(roster)
-                rosters_added = True
+                club = club_result.scalar_one_or_none()
+                if club is None:
+                    club = Club(
+                        name=club_sample["name"],
+                        city=club_sample.get("city"),
+                        country=club_sample.get("country", sample.get("country")),
+                        federation_id=federation.id,
+                    )
+                    session.add(club)
+                    await session.flush()
+                    clubs_added = True
+
+                for roster_sample in club_sample.get("rosters", []):
+                    roster_name = roster_sample.get("name", club_sample["name"])
+                    exists = await session.execute(
+                        select(Roster.id).where(Roster.name == roster_name)
+                    )
+                    if exists.scalar_one_or_none() is not None:
+                        continue
+                    roster = Roster(
+                        name=roster_name,
+                        country=club_sample.get("country", sample.get("country") or ""),
+                        division=roster_sample.get("division", "Senior"),
+                        coach_name=roster_sample.get("coach_name", "Trackeo Coach"),
+                        athlete_count=roster_sample.get("athlete_count", 0),
+                        club_id=club.id,
+                    )
+                    session.add(roster)
+                    rosters_added = True
 
         events_seeded = False
         for sample in SAMPLE_EVENTS:
@@ -271,7 +332,7 @@ async def seed_initial_data() -> None:
             session.add(article)
             news_added = True
 
-        if federations_added or rosters_added or news_added:
+        if federations_added or clubs_added or rosters_added or news_added:
             await session.commit()
     finally:
         await session.close()

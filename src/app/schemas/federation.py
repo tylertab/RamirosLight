@@ -14,7 +14,7 @@ class FederationSubmissionBase(BaseModel):
 
 
 class FederationSubmissionCreate(FederationSubmissionBase):
-    pass
+    access_token: str = Field(..., min_length=8, max_length=128)
 
 
 class FederationSubmissionRead(FederationSubmissionBase):

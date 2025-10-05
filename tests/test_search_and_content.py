@@ -1,138 +1,49 @@
 import pytest
 
-from uuid import uuid4
-
-from app.domain import SubscriptionTier
-
-
 pytestmark = pytest.mark.anyio("asyncio")
 
 
-async def test_search_returns_multi_category_results(client):
-    unique = uuid4().hex[:6]
-    coach_payload = {
-        "email": f"searchcoach_{unique}@example.com",
-        "full_name": "Search Coach",
-        "role": "coach",
-        "password": "SecurePass123",
-    }
-    athlete_payload = {
-        "email": f"searchathlete_{unique}@example.com",
-        "full_name": "Club Runner",
-        "role": "athlete",
-        "password": "SecurePass123",
-    }
-
-    await client.post("/api/v1/accounts/register", json=coach_payload)
-    await client.post("/api/v1/accounts/register", json=athlete_payload)
-
-    login_response = await client.post(
-        "/api/v1/accounts/login",
-        data={"username": coach_payload["email"], "password": coach_payload["password"]},
-    )
-    assert login_response.status_code == 200
-    token = login_response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
-
-    await client.post(
-        "/api/v1/subscriptions/upgrade",
-        json={"tier": SubscriptionTier.COACH.value, "duration_days": 90},
-        headers=headers,
-    )
-
-    await client.post(
-        "/api/v1/events/",
-        json={
-            "name": f"Club Championship {unique}",
-            "location": "Sao Paulo",
-            "start_date": "2025-05-01",
-            "end_date": "2025-05-02",
-            "federation_id": None,
-        },
-    )
-
-    await client.post(
-        "/api/v1/rosters/",
-        json={
-            "name": f"Club Condor {unique}",
-            "country": "Chile",
-            "division": "Senior",
-            "coach_name": "Ana Morales",
-            "athlete_count": 15,
-        },
-        headers=headers,
-    )
-
-    await client.post(
-        "/api/v1/news/",
-        json={
-            "title": f"Club Condor {unique} secures relay victory",
-            "region": "Santiago",
-            "excerpt": "Dominant performance in regional finals.",
-            "content": "Full race analysis for premium subscribers.",
-            "audience": "premium",
-        },
-        headers=headers,
-    )
-
-    search_response = await client.get(
+async def test_search_returns_federations_clubs_events_and_results(client):
+    federation_response = await client.get(
         "/api/v1/search/",
-        params={"query": "Club", "categories": ["athletes", "events", "rosters", "news"]},
-        headers=headers,
+        params={"query": "Federación", "categories": ["federations"]},
     )
-    assert search_response.status_code == 200
-    results = search_response.json()["results"]
-    categories = {result["category"] for result in results}
-    assert {"Athletes", "Events", "Rosters", "News"}.issubset(categories)
+    assert federation_response.status_code == 200
+    assert any(result["category"] == "Federations" for result in federation_response.json()["results"])
 
-
-async def test_detail_endpoints_surface_linked_data(client):
-    unique = uuid4().hex[:6]
-    athlete_payload = {
-        "email": f"detail_athlete_{unique}@example.com",
-        "full_name": "Detail Athlete",
-        "role": "athlete",
-        "password": "DetailPass123",
-    }
-
-    register_response = await client.post("/api/v1/accounts/register", json=athlete_payload)
-    assert register_response.status_code == 201
-    athlete = register_response.json()
-
-    login_response = await client.post(
-        "/api/v1/accounts/login",
-        data={"username": athlete_payload["email"], "password": athlete_payload["password"]},
+    clubs_response = await client.get(
+        "/api/v1/search/",
+        params={"query": "Peaks", "categories": ["clubs"]},
     )
-    assert login_response.status_code == 200
-    token = login_response.json()["access_token"]
-    headers = {"Authorization": f"Bearer {token}"}
+    assert clubs_response.status_code == 200
+    assert any(result["category"] == "Clubs" for result in clubs_response.json()["results"])
 
-    upgrade_response = await client.post(
-        "/api/v1/subscriptions/upgrade",
-        json={"tier": SubscriptionTier.COACH.value, "duration_days": 60},
-        headers=headers,
+    events_response = await client.get(
+        "/api/v1/search/",
+        params={"query": "Aurora", "categories": ["events"]},
     )
-    assert upgrade_response.status_code == 200
+    assert events_response.status_code == 200
+    assert any(result["category"] == "Events" for result in events_response.json()["results"])
 
-    roster_payload = {
-        "name": f"Detail Club {unique}",
-        "country": "Argentina",
-        "division": "Senior",
-        "coach_name": "Lucia Perez",
-        "athlete_count": 8,
-    }
-    roster_response = await client.post("/api/v1/rosters/", json=roster_payload, headers=headers)
-    assert roster_response.status_code == 201
-    roster = roster_response.json()
+    results_response = await client.get(
+        "/api/v1/search/",
+        params={"query": "Relays", "categories": ["results"]},
+    )
+    assert results_response.status_code == 200
+    assert any(result["category"] == "Results" for result in results_response.json()["results"])
 
-    athlete_detail_response = await client.get(f"/api/v1/athletes/{athlete['id']}")
-    assert athlete_detail_response.status_code == 200
-    athlete_detail = athlete_detail_response.json()
-    assert athlete_detail["full_name"] == athlete_payload["full_name"]
-    assert any(item["id"] == roster["id"] for item in athlete_detail.get("rosters", []))
 
-    roster_detail_response = await client.get(f"/api/v1/rosters/{roster['id']}")
-    assert roster_detail_response.status_code == 200
-    roster_detail = roster_detail_response.json()
-    assert roster_detail["owner"]["full_name"] == athlete_payload["full_name"]
-    assert any(item["id"] == athlete["id"] for item in roster_detail.get("athletes", []))
+async def test_roster_detail_includes_club_and_federation_context(client):
+    rosters_response = await client.get("/api/v1/rosters/")
+    assert rosters_response.status_code == 200
+    rosters = rosters_response.json()
+    assert rosters
+    roster = rosters[0]
+
+    detail_response = await client.get(f"/api/v1/rosters/{roster['id']}")
+    assert detail_response.status_code == 200
+    detail = detail_response.json()
+    assert detail["club_id"] == roster["club_id"]
+    assert detail["club_name"]
+    assert detail["federation_id"] is not None
+    assert detail["federation_name"]

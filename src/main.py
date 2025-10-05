@@ -16,7 +16,7 @@ from app.api.v1.routes import (
     news,
     rosters,
     search,
-    subscriptions,
+    subscribers,
 )
 from app.core.config import SettingsSingleton
 from app.core.database import init_models
@@ -185,13 +185,13 @@ def create_app() -> FastAPI:
 
     application.include_router(health.router, prefix=settings.api_v1_prefix)
     application.include_router(accounts.router, prefix=settings.api_v1_prefix)
-    application.include_router(subscriptions.router, prefix=settings.api_v1_prefix)
     application.include_router(athletes.router, prefix=settings.api_v1_prefix)
     application.include_router(bootstrap.router, prefix=settings.api_v1_prefix)
     application.include_router(events.router, prefix=settings.api_v1_prefix)
     application.include_router(rosters.router, prefix=settings.api_v1_prefix)
     application.include_router(news.router, prefix=settings.api_v1_prefix)
     application.include_router(search.router, prefix=settings.api_v1_prefix)
+    application.include_router(subscribers.router, prefix=settings.api_v1_prefix)
     application.include_router(federations.router, prefix=settings.api_v1_prefix)
 
     return application

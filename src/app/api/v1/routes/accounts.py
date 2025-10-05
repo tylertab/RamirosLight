@@ -3,7 +3,6 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from app.core.authorization import get_current_user_with_model
 from app.core.security import TokenService
-from app.domain import SubscriptionTier
 from app.schemas.auth import TokenResponse
 from app.schemas.user import UserCreate, UserRead
 from app.services.accounts import AccountsService, get_accounts_service
@@ -46,11 +45,7 @@ async def login(
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect credentials")
     token, expires_at = TokenService().create_access_token({"sub": str(user.id)})
-    return TokenResponse(
-        access_token=token,
-        expires_at=expires_at,
-        subscription_tier=SubscriptionTier(user.subscription_tier),
-    )
+    return TokenResponse(access_token=token, expires_at=expires_at)
 
 
 @router.get("/me", response_model=UserRead)

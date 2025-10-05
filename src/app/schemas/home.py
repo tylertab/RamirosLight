@@ -10,15 +10,25 @@ from app.schemas.event import EventDetailRead, EventRead
 from app.schemas.news import NewsRead
 
 
-class HomeClub(BaseModel):
-    """Representation of a club or roster surfaced on the home page."""
+class HomeRoster(BaseModel):
+    """Lightweight roster summary nested under a club."""
 
     id: int | None = None
     name: str
-    country: str | None = None
     division: str | None = None
     coach_name: str | None = None
     athlete_count: int | None = None
+    updated_at: datetime | None = None
+
+
+class HomeClub(BaseModel):
+    """Representation of a club surfaced on the home page."""
+
+    id: int
+    name: str
+    city: str | None = None
+    country: str | None = None
+    rosters: list[HomeRoster] = Field(default_factory=list)
 
 
 class HomeFederation(BaseModel):
@@ -46,6 +56,8 @@ class HomeResult(BaseModel):
     points: int | None = None
     roster_id: int | None = None
     roster_name: str | None = None
+    club_id: int | None = None
+    club_name: str | None = None
     federation_id: int | None = None
     federation_name: str | None = None
     updated_at: datetime | None = None
