@@ -38,6 +38,7 @@ class DatabaseSchemaManager:
         async with self._engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
             await conn.run_sync(self._ensure_user_subscription_columns)
+            await conn.run_sync(self._ensure_federation_submission_columns)
 
     def _ensure_user_subscription_columns(self, sync_conn) -> None:
         if sync_conn.dialect.name != "sqlite":
@@ -56,6 +57,31 @@ class DatabaseSchemaManager:
         for column_name, ddl in required_columns.items():
             if column_name not in existing_columns:
                 sync_conn.execute(sa.text(f"ALTER TABLE users ADD COLUMN {column_name} {ddl}"))
+
+    def _ensure_federation_submission_columns(self, sync_conn) -> None:
+        if sync_conn.dialect.name != "sqlite":
+            return
+
+        inspector = sa.inspect(sync_conn)
+        if "federation_submissions" not in inspector.get_table_names():
+            return
+
+        existing_columns = {
+            column["name"] for column in inspector.get_columns("federation_submissions")
+        }
+
+        required_columns = {
+            "status_details": "VARCHAR(500)",
+            "processed_at": "TIMESTAMP",
+            "verified_at": "TIMESTAMP",
+            "checksum": "VARCHAR(128)",
+        }
+
+        for column_name, ddl in required_columns.items():
+            if column_name not in existing_columns:
+                sync_conn.execute(
+                    sa.text(f"ALTER TABLE federation_submissions ADD COLUMN {column_name} {ddl}")
+                )
 
 
 async def init_models() -> None:
