@@ -39,6 +39,7 @@ class DatabaseSchemaManager:
             await conn.run_sync(Base.metadata.create_all)
             await conn.run_sync(self._ensure_user_subscription_columns)
             await conn.run_sync(self._ensure_federation_submission_columns)
+            await conn.run_sync(self._ensure_federation_columns)
 
     def _ensure_user_subscription_columns(self, sync_conn) -> None:
         if sync_conn.dialect.name != "sqlite":
@@ -82,6 +83,21 @@ class DatabaseSchemaManager:
                 sync_conn.execute(
                     sa.text(f"ALTER TABLE federation_submissions ADD COLUMN {column_name} {ddl}")
                 )
+
+    def _ensure_federation_columns(self, sync_conn) -> None:
+        if sync_conn.dialect.name != "sqlite":
+            return
+
+        inspector = sa.inspect(sync_conn)
+        if "federations" not in inspector.get_table_names():
+            return
+
+        existing_columns = {column["name"] for column in inspector.get_columns("federations")}
+
+        if "ingest_token_hash" not in existing_columns:
+            sync_conn.execute(
+                sa.text("ALTER TABLE federations ADD COLUMN ingest_token_hash VARCHAR(128)")
+            )
 
 
 async def init_models() -> None:
