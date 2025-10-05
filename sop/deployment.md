@@ -1,47 +1,78 @@
 # Deployment SOP
 
 ## Overview
-This SOP outlines how to deploy the FastAPI service onto a free-tier platform. Instructions assume you use Railway, but Render/Fly.io follow similar steps.
+Deploy the FastAPI + server-rendered portal to a free-tier platform. These instructions assume [Railway](https://railway.app/) but translate directly to Render or Fly.io. The application boots via `uvicorn`, auto-creates tables, and seeds demo data when the environment variable `ATHLETICS_SEED_DEMO_DATA` (default `True`) is set.
 
 ## 1. Prerequisites
-- GitHub repository with latest code pushed to `main`.
-- Railway account (free tier) linked to GitHub.
+- GitHub repository up to date on `main`.
+- Railway account linked to GitHub.
+- Neon (or equivalent Postgres provider) project with credentials.
+- Optional: Better Stack account for centralized logs + uptime.
 
-## 2. Initial Provisioning
-1. Sign in to [Railway](https://railway.app/).
-2. Create a new project and select **Deploy from GitHub repo**.
-3. Choose the repository hosting this backend.
-4. On the service setup page, specify:
+Before provisioning, run the local checks:
+
+```bash
+./scripts/dev_setup.sh  # ensures dependencies + migrations succeed locally
+pytest                   # run automated tests
+```
+
+If your environment blocks outbound PyPI traffic, configure `PIP_INDEX_URL`/`PIP_EXTRA_INDEX_URL` before invoking the setup script.
+
+## 2. Prepare Environment Variables
+Create a `.env.production` file locally based on `.env.example` and populate secrets. Required keys:
+
+| Variable | Description | Example |
+| --- | --- | --- |
+| `ATHLETICS_PROJECT_NAME` | Display name for the app | `Pan-American Athletics Hub` |
+| `ATHLETICS_ENVIRONMENT` | Environment label | `production` |
+| `ATHLETICS_DATABASE_URL` | SQLAlchemy async URL | `postgresql+asyncpg://<user>:<pwd>@<host>/<db>` |
+| `ATHLETICS_SECRET_KEY` | JWT signing key | `generate-long-random-value` |
+| `ATHLETICS_ALLOWED_HOSTS` | Comma-separated hostnames | `your-subdomain.up.railway.app` |
+| `ATHLETICS_REDIS_URL` | (Optional) external Redis | `rediss://...` |
+| `ATHLETICS_SEED_DEMO_DATA` | Disable demo seeding in prod | `false` |
+
+> **Note:** The project uses the `asyncpg` driver. Ensure `requirements.txt` is synced in Railway so Nixpacks installs `asyncpg` during the build.
+
+## 3. Provision the Railway Service
+1. In Railway, **New Project → Deploy from GitHub Repo**, pick this repository.
+2. Set the service to use the Python environment (Railway auto-detects with Nixpacks).
+3. Under **Variables**, paste the values from your production env file.
+4. Override the generated commands:
    - **Build Command:** `pip install -r requirements.txt`
    - **Start Command:** `uvicorn src.main:app --host 0.0.0.0 --port $PORT`
-   - **Environment:** Python 3.11 (set via Railway's Nixpacks or add `railway.toml`). Static assets are served directly from `src/app/web/static`, so no additional build steps are required.
-5. Add environment variables from `.env.example` under the project settings.
-6. Deploy and monitor build logs.
+5. Trigger the first deploy and monitor build logs. Expect `uvicorn` to start listening on the provided port.
 
-## 3. Database Setup (Neon)
-1. Create a free account at [Neon](https://console.neon.tech/).
-2. Provision a Postgres database and note the connection string.
-3. Update Railway environment variable `ATHLETICS_DATABASE_URL` with the Neon connection string (use `postgresql+psycopg_async://` driver, install `psycopg[binary]`).
-4. Run migrations/initialization (Railway shells need `PYTHONPATH=src` to resolve the `app.*` modules):
+## 4. Database Setup with Neon
+1. Create a free Postgres branch + database in Neon.
+2. From the Neon dashboard, copy the connection string and convert to SQLAlchemy async format by replacing the prefix with `postgresql+asyncpg://`.
+3. Update the Railway `ATHLETICS_DATABASE_URL` variable with this async URL. Include `sslmode=require` query parameter if mandated by the provider.
+4. From the Railway project shell run schema initialization (FastAPI also runs this on boot, but doing it manually surfaces issues early):
+
    ```bash
    railway run "PYTHONPATH=src python -c 'import asyncio; from app.core.database import init_models; asyncio.run(init_models())'"
    ```
 
-## 4. Continuous Deployment
-- Enable Railway's auto-deploy on push to `main` or a dedicated `deploy` branch.
-- Protect the branch with required status checks (tests, lint).
+5. (Optional) Seed production-safe data by invoking `app.services.bootstrap.seed_initial_data` with `ATHLETICS_SEED_DEMO_DATA=false` to avoid demo entries.
 
-## 5. Post-Deployment Verification
-- Hit `/api/v1/health` to verify readiness.
-- Load `https://<railway-app>.up.railway.app/` to confirm templates render, navigation links work, and the locale switcher persists selections.
-- Create a test user using `/api/v1/accounts/register` or via the `/signup` page; ensure the login view issues tokens that allow `/federations/upload` submissions.
-- Confirm database entries via Neon dashboard.
+## 5. Continuous Deployment
+- Enable auto-deploy on push to `main` (or a dedicated `deploy` branch) in Railway settings.
+- Protect the branch with CI checks: `pytest`, linting, security scan (e.g., `pip-audit`).
+- Document environment changes in the repository (`sop/deployment.md`) when variables or commands evolve.
 
-## 6. Rollback Procedure
-- Railway retains previous deploys. Use the **Deployments** tab to redeploy the last known good version.
-- Alternatively, redeploy a specific git commit.
+## 6. Post-Deployment Verification
+After each deploy:
+- Visit `https://<railway-app>.up.railway.app/` and navigate home → profiles → events → federations upload to verify template rendering + localization.
+- Call `GET /api/v1/health` to ensure the service is healthy.
+- Exercise authentication: register (`/api/v1/accounts/register`), log in (`/login`), and confirm token issuance allows `/federations/upload` submissions.
+- Inspect Neon to confirm new users/events persist.
 
-## 7. Monitoring & Alerts
-- Connect Railway logs to [Better Stack Logs](https://betterstack.com/logs) for persisted logging.
-- Configure uptime monitoring using [Better Stack Uptime](https://betterstack.com/uptime) or [UptimeRobot](https://uptimerobot.com/).
+## 7. Rollback Procedure
+- Use Railway **Deployments → Redeploy** on the last known good build.
+- If configuration drift is suspected, restore previous env variable values via **Variables → History**.
+- Communicate the incident + mitigation steps following the Operations SOP.
+
+## 8. Monitoring & Alerts
+- Stream Railway logs to [Better Stack Logs](https://betterstack.com/logs) for retention.
+- Configure uptime probes (Better Stack Uptime or UptimeRobot) hitting `/api/v1/health` every minute.
+- Set Neon connection alerts for connection spikes or CPU limits.
 
