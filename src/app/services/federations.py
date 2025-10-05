@@ -5,11 +5,16 @@ from urllib.parse import urlparse
 from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.core.database import DatabaseSessionManager, get_session
 from app.integrations.message_bus import MessageBus
-from app.models import FederationSubmission, FederationSubmissionStatus
-from app.schemas.federation import FederationSubmissionCreate, FederationSubmissionRead
+from app.models import Club, Federation, FederationSubmission, FederationSubmissionStatus
+from app.schemas.federation import (
+    FederationSubmissionCreate,
+    FederationSubmissionRead,
+    FederationWithClubs,
+)
 
 
 class FederationIngestionService:
@@ -82,4 +87,25 @@ class FederationSubmissionProcessor:
 
 
 _processor = FederationSubmissionProcessor()
+
+
+class FederationsService:
+    def __init__(self, session: AsyncSession) -> None:
+        self._session = session
+
+    async def list_with_clubs(self) -> list[FederationWithClubs]:
+        stmt = (
+            select(Federation)
+            .options(selectinload(Federation.clubs).selectinload(Club.rosters))
+            .options(selectinload(Federation.clubs).selectinload(Club.manager))
+        )
+        result = await self._session.execute(stmt)
+        federations = result.scalars().all()
+        return [FederationWithClubs.model_validate(item) for item in federations]
+
+
+async def get_federations_directory_service(
+    session: AsyncSession = Depends(get_session),
+) -> FederationsService:
+    return FederationsService(session)
 

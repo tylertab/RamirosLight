@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
-from app.models import Event, Federation, NewsArticle, NewsAudience, Roster
+from app.models import Club, Event, Federation, NewsArticle, NewsAudience, Roster, User
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
 from app.services.events import EventsService
 
@@ -75,6 +75,43 @@ SAMPLE_FEDERATIONS: list[dict[str, object]] = [
                 "athlete_count": 21,
             },
         ],
+    },
+]
+
+SAMPLE_FEDERATIONS: list[dict[str, object]] = [
+    {
+        "name": "Confederación Sudamericana de Atletismo",
+        "country": "South America",
+        "website": "https://consudatle.org",
+    },
+    {
+        "name": "Brazilian Athletics Confederation",
+        "country": "Brazil",
+        "website": "https://www.cbat.org.br",
+    },
+]
+
+SAMPLE_CLUBS: list[dict[str, object]] = [
+    {
+        "name": "Club Andino Quito",
+        "city": "Quito",
+        "country": "Ecuador",
+        "federation_name": "Confederación Sudamericana de Atletismo",
+        "manager_email": "ramiro.lightfoot@example.com",
+    },
+    {
+        "name": "São Paulo Relays",
+        "city": "São Paulo",
+        "country": "Brazil",
+        "federation_name": "Brazilian Athletics Confederation",
+        "manager_email": "sofia.delgado@example.com",
+    },
+    {
+        "name": "Buenos Aires Elite",
+        "city": "Buenos Aires",
+        "country": "Argentina",
+        "federation_name": "Confederación Sudamericana de Atletismo",
+        "manager_email": "liam.oconnor@example.com",
     },
 ]
 
@@ -202,6 +239,42 @@ async def seed_initial_data() -> None:
                 federations_added = True
             federation_ids[federation.name] = federation.id
 
+        federation_ids: dict[str, int] = {}
+        federations_added = False
+        for sample in SAMPLE_FEDERATIONS:
+            exists = await session.execute(
+                select(Federation.id).where(Federation.name == sample["name"])
+            )
+            federation_id = exists.scalar_one_or_none()
+            if federation_id is None:
+                federation = Federation(**sample)
+                session.add(federation)
+                await session.flush()
+                federation_ids[sample["name"]] = federation.id
+                federations_added = True
+            else:
+                federation_ids[sample["name"]] = federation_id
+
+        clubs_added = False
+        club_ids: dict[str, int] = {}
+        for sample in SAMPLE_CLUBS:
+            exists = await session.execute(select(Club).where(Club.name == sample["name"]))
+            club = exists.scalar_one_or_none()
+            if club is None:
+                federation_name = sample.get("federation_name")
+                manager_email = sample.get("manager_email")
+                club = Club(
+                    name=sample["name"],
+                    city=sample.get("city"),
+                    country=sample["country"],
+                    federation_id=federation_ids.get(federation_name) if federation_name else None,
+                    manager_id=user_ids.get(manager_email) if manager_email else None,
+                )
+                session.add(club)
+                await session.flush()
+                clubs_added = True
+            club_ids[club.name] = club.id
+
         rosters_added = False
         for federation in SAMPLE_FEDERATIONS:
             for club in federation.get("clubs", []):
@@ -232,7 +305,7 @@ async def seed_initial_data() -> None:
                 location=sample["location"],
                 start_date=sample["start_date"],
                 end_date=sample["end_date"],
-                federation_id=federation_ids.get(sample.get("federation")),
+                federation_id=federation_ids.get(sample.get("federation_name"))
             )
             created = await events_service.create_event(payload)
             events_seeded = True
@@ -271,7 +344,7 @@ async def seed_initial_data() -> None:
             session.add(article)
             news_added = True
 
-        if federations_added or rosters_added or news_added:
+        if rosters_added or news_added or events_seeded or clubs_added or federations_added:
             await session.commit()
     finally:
         await session.close()

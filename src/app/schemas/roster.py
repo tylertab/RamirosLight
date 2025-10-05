@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.schemas.athlete import AthleteSummary
+from app.schemas.federation import ClubCreate, ClubSummary, FederationSummary
 from app.schemas.user import UserRead
 
 
@@ -17,15 +18,23 @@ class RosterBase(BaseModel):
 
 
 class RosterCreate(RosterBase):
-    pass
+    club_id: int | None = Field(default=None, ge=1)
+    club: ClubCreate | None = None
+
+    @model_validator(mode="after")
+    def validate_club(self) -> "RosterCreate":
+        if self.club_id is None and self.club is None:
+            raise ValueError("Club reference or details must be provided")
+        return self
 
 
 class RosterRead(RosterBase):
     id: int
     updated_at: datetime
+    club: ClubSummary | None = None
+    federation: FederationSummary | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class RosterDetail(RosterRead):

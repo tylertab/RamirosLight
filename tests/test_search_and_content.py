@@ -59,6 +59,12 @@ async def test_search_returns_multi_category_results(client):
             "division": "Senior",
             "coach_name": "Ana Morales",
             "athlete_count": 15,
+            "club": {
+                "name": f"Condor Athletics {unique}",
+                "city": "Santiago",
+                "country": "Chile",
+                "federation_id": None,
+            },
         },
         headers=headers,
     )
@@ -120,10 +126,18 @@ async def test_detail_endpoints_surface_linked_data(client):
         "division": "Senior",
         "coach_name": "Lucia Perez",
         "athlete_count": 8,
+        "club": {
+            "name": f"River Plate Track {unique}",
+            "city": "Buenos Aires",
+            "country": "Argentina",
+            "federation_id": None,
+        },
     }
     roster_response = await client.post("/api/v1/rosters/", json=roster_payload, headers=headers)
     assert roster_response.status_code == 201
     roster = roster_response.json()
+    assert roster["club"]["name"] == roster_payload["club"]["name"]
+    assert roster["federation"] is None
 
     athlete_detail_response = await client.get(f"/api/v1/athletes/{athlete['id']}")
     assert athlete_detail_response.status_code == 200
@@ -135,4 +149,6 @@ async def test_detail_endpoints_surface_linked_data(client):
     assert roster_detail_response.status_code == 200
     roster_detail = roster_detail_response.json()
     assert roster_detail["owner"]["full_name"] == athlete_payload["full_name"]
+    assert roster_detail["club"]["name"] == roster_payload["club"]["name"]
+    assert roster_detail["federation"] is None
     assert any(item["id"] == athlete["id"] for item in roster_detail.get("athletes", []))
