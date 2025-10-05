@@ -1,13 +1,26 @@
 import pytest
 from uuid import uuid4
 
+from app.core.database import DatabaseSessionManager
 from app.domain import SubscriptionTier
+from app.models import Federation
 
 pytestmark = pytest.mark.anyio("asyncio")
 
 
 async def test_bootstrap_home_endpoint_returns_data(client):
     unique = uuid4().hex[:6]
+    session = DatabaseSessionManager().session()
+    federation = Federation(
+        name=f"Federación Snapshot {unique}",
+        country="Bolivia",
+        website="https://snapshot-fed.example.com",
+    )
+    session.add(federation)
+    await session.commit()
+    await session.refresh(federation)
+    await session.close()
+
     coach_payload = {
         "email": f"coach_{unique}@example.com",
         "full_name": "Coach Snapshot",
@@ -25,7 +38,7 @@ async def test_bootstrap_home_endpoint_returns_data(client):
         "location": "La Paz, Bolivia",
         "start_date": "2025-06-05",
         "end_date": "2025-06-07",
-        "federation_id": None,
+        "federation_id": federation.id,
     }
     roster_payload = {
         "name": f"Snapshot Club {unique}",
@@ -89,7 +102,9 @@ async def test_bootstrap_home_endpoint_returns_data(client):
     assert any(user["email"] == athlete_payload["email"] for user in data["athletes"])
     assert any(event["id"] == event_id for event in data["events"])
     assert any(roster["name"] == roster_payload["name"] for roster in data["rosters"])
+    assert any(fed["name"].startswith("Federación Snapshot") for fed in data["federations"])
     assert any(article["title"] == news_payload["title"] for article in data["news"])
+    assert any(result["event_id"] == event_id for result in data["results"])
     assert data["live_event"]
     assert data["live_event"]["disciplines"]
 

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from app.core.database import DatabaseSessionManager
 from app.domain import SubscriptionTier
@@ -19,20 +20,25 @@ from app.schemas.event import (
     EventSessionRead,
     EventSessionStatus,
 )
+from app.schemas.federation import FederationRead
 from app.schemas.home import HomeSnapshot
 from app.schemas.news import NewsRead
+from app.schemas.result import ResultSummary
 from app.schemas.roster import RosterRead
 from app.schemas.user import UserRead
 from app.services.accounts import AccountsService
 from app.services.bootstrap import (
     SAMPLE_EVENTS,
+    SAMPLE_FEDERATIONS,
     SAMPLE_NEWS,
     SAMPLE_ROSTERS,
     SAMPLE_USERS,
 )
 from app.services.events import EventsService
 from app.services.news import NewsService
+from app.services.results import ResultsService
 from app.services.rosters import RostersService
+from app.models import Federation
 
 
 def _fallback_athletes() -> list[UserRead]:
@@ -80,6 +86,79 @@ def _fallback_rosters() -> list[RosterRead]:
             updated_at=now - timedelta(days=index),
         )
         for index, item in enumerate(SAMPLE_ROSTERS, start=1)
+    ]
+
+
+def _fallback_federations() -> list[FederationRead]:
+    return [
+        FederationRead(
+            id=index,
+            name=item["name"],
+            country=item.get("country"),
+            website=item.get("website"),
+        )
+        for index, item in enumerate(SAMPLE_FEDERATIONS, start=1)
+    ]
+
+
+def _fallback_results() -> list[ResultSummary]:
+    now = datetime.now(tz=timezone.utc)
+    return [
+        ResultSummary(
+            entry_id=index,
+            event_id=item["event_id"],
+            event_name=item["event_name"],
+            event_location=item.get("event_location"),
+            discipline_id=item["discipline_id"],
+            discipline_name=item["discipline_name"],
+            discipline_round=item.get("discipline_round"),
+            athlete_name=item["athlete_name"],
+            team_name=item.get("team_name"),
+            position=item.get("position"),
+            result=item.get("result"),
+            updated_at=now - timedelta(minutes=index * 5),
+        )
+        for index, item in enumerate(
+            [
+                {
+                    "event_id": 1,
+                    "event_name": "Aurora Indoor Classic",
+                    "event_location": "Oslo, Norway",
+                    "discipline_id": 1,
+                    "discipline_name": "Women's 100m",
+                    "discipline_round": "Final",
+                    "athlete_name": "Valentina Ríos",
+                    "team_name": "Andean Flyers",
+                    "position": 1,
+                    "result": "11.32s",
+                },
+                {
+                    "event_id": 1,
+                    "event_name": "Aurora Indoor Classic",
+                    "event_location": "Oslo, Norway",
+                    "discipline_id": 2,
+                    "discipline_name": "Men's Long Jump",
+                    "discipline_round": "Final",
+                    "athlete_name": "Daniel Torres",
+                    "team_name": "Granada Hurdlers",
+                    "position": 1,
+                    "result": "7.88m",
+                },
+                {
+                    "event_id": 2,
+                    "event_name": "Sunset Coast Invitational",
+                    "event_location": "Porto, Portugal",
+                    "discipline_id": 3,
+                    "discipline_name": "Mixed 4x400m",
+                    "discipline_round": "Final",
+                    "athlete_name": "São Paulo Relays",
+                    "team_name": None,
+                    "position": 1,
+                    "result": "3:15.40",
+                },
+            ],
+            start=1,
+        )
     ]
 
 
@@ -306,16 +385,22 @@ def _ensure_list(value: Iterable) -> list:
 
 async def get_home_snapshot() -> HomeSnapshot:
     session = DatabaseSessionManager().session()
+    results: list[ResultSummary] | None = None
+    federations: list[Federation] | None = None
     try:
         accounts_service = AccountsService(session)
         events_service = EventsService(session)
         rosters_service = RostersService(session)
+        results_service = ResultsService(session)
         news_service = NewsService(session)
 
         athletes = await accounts_service.list_users()
         events = await events_service.list_events()
         rosters = await rosters_service.list_rosters()
+        federations_result = await session.execute(select(Federation).limit(12))
+        federations = federations_result.scalars().all()
         news = await news_service.list_articles(SubscriptionTier.FREE)
+        results = await results_service.list_recent(limit=12)
 
         live_event: EventDetailRead | None = None
         for event in events:
@@ -332,7 +417,13 @@ async def get_home_snapshot() -> HomeSnapshot:
     athletes_list = _ensure_list(athletes) or _fallback_athletes()
     events_list = _ensure_list(events) or _fallback_events()
     rosters_list = _ensure_list(rosters) or _fallback_rosters()
+    federations_list = (
+        [FederationRead.model_validate(item) for item in federations]
+        if federations
+        else _fallback_federations()
+    )
     news_list = _ensure_list(news) or _fallback_news()
+    results_list = _ensure_list(results) or _fallback_results()
 
     if live_event is None:
         first_event_id = events_list[0].id if events_list else 1
@@ -342,6 +433,8 @@ async def get_home_snapshot() -> HomeSnapshot:
         athletes=athletes_list,
         events=events_list,
         rosters=rosters_list,
+        federations=federations_list,
+        results=results_list,
         news=news_list,
         live_event=live_event,
     )

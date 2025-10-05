@@ -2,7 +2,9 @@ import pytest
 
 from uuid import uuid4
 
+from app.core.database import DatabaseSessionManager
 from app.domain import SubscriptionTier
+from app.models import Federation
 
 
 pytestmark = pytest.mark.anyio("asyncio")
@@ -10,6 +12,17 @@ pytestmark = pytest.mark.anyio("asyncio")
 
 async def test_search_returns_multi_category_results(client):
     unique = uuid4().hex[:6]
+    session = DatabaseSessionManager().session()
+    federation = Federation(
+        name=f"Andean Athletics Federation {unique}",
+        country="Chile",
+        website="https://andina.example.com",
+    )
+    session.add(federation)
+    await session.commit()
+    await session.refresh(federation)
+    await session.close()
+
     coach_payload = {
         "email": f"searchcoach_{unique}@example.com",
         "full_name": "Search Coach",
@@ -40,21 +53,33 @@ async def test_search_returns_multi_category_results(client):
         headers=headers,
     )
 
-    await client.post(
+    event_response = await client.post(
         "/api/v1/events/",
         json={
-            "name": f"Club Championship {unique}",
+            "name": f"Andean Championship {unique}",
             "location": "Sao Paulo",
             "start_date": "2025-05-01",
             "end_date": "2025-05-02",
-            "federation_id": None,
+            "federation_id": federation.id,
+        },
+    )
+    assert event_response.status_code == 201
+    event_id = event_response.json()["id"]
+    await client.post(
+        f"/api/v1/events/{event_id}/demo",
+        json={
+            "start_time": "2025-05-01T14:00:00Z",
+            "sessions": 1,
+            "disciplines_per_session": 2,
+            "lanes": 4,
+            "include_results": True,
         },
     )
 
     await client.post(
         "/api/v1/rosters/",
         json={
-            "name": f"Club Condor {unique}",
+            "name": f"Club Andean Condor {unique}",
             "country": "Chile",
             "division": "Senior",
             "coach_name": "Ana Morales",
@@ -66,7 +91,7 @@ async def test_search_returns_multi_category_results(client):
     await client.post(
         "/api/v1/news/",
         json={
-            "title": f"Club Condor {unique} secures relay victory",
+            "title": f"Andean relay squad {unique} secures victory",
             "region": "Santiago",
             "excerpt": "Dominant performance in regional finals.",
             "content": "Full race analysis for premium subscribers.",
@@ -77,13 +102,21 @@ async def test_search_returns_multi_category_results(client):
 
     search_response = await client.get(
         "/api/v1/search/",
-        params={"query": "Club", "categories": ["athletes", "events", "rosters", "news"]},
+        params={
+            "query": "Andean",
+            "categories": ["events", "federations", "clubs", "news", "results"],
+        },
         headers=headers,
     )
     assert search_response.status_code == 200
     results = search_response.json()["results"]
     categories = {result["category"] for result in results}
-    assert {"Athletes", "Events", "Rosters", "News"}.issubset(categories)
+    assert {"Events", "Federations", "Clubs", "News", "Results"}.issubset(categories)
+    assert any(item["title"].startswith("Andean Championship") for item in results if item["category"] == "Events")
+    assert any("Andean Athletics Federation" in item["title"] for item in results if item["category"] == "Federations")
+    assert any("Club Andean" in item["title"] for item in results if item["category"] == "Clubs")
+    assert any("Andean relay" in item["title"] for item in results if item["category"] == "News")
+    assert any("Andean Championship" in item.get("subtitle", "") for item in results if item["category"] == "Results")
 
 
 async def test_detail_endpoints_surface_linked_data(client):

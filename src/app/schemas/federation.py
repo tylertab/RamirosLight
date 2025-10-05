@@ -6,6 +6,15 @@ from app.models.federation import FederationSubmissionStatus
 from app.schemas.user import EmailField
 
 
+class FederationRead(BaseModel):
+    id: int
+    name: str
+    country: str | None = None
+    website: str | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
+
 class FederationSubmissionBase(BaseModel):
     federation_name: str = Field(..., min_length=3, max_length=120)
     contact_email: EmailField

@@ -5,9 +5,10 @@ from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
-from app.domain import SubscriptionTier
-from app.models import Event, NewsArticle, NewsAudience, Roster, User
+from app.models import Event, Federation, NewsArticle, Roster
+from app.schemas.result import ResultSummary
 from app.schemas.search import SearchResponse, SearchResult
+from app.services.results import ResultsService
 
 
 class SearchService:
@@ -18,47 +19,24 @@ class SearchService:
         self,
         query: str,
         categories: Iterable[str],
-        tier: SubscriptionTier,
     ) -> SearchResponse:
         normalized = {category.lower() for category in categories if category}
         if not normalized or "all" in normalized:
-            normalized = {"athletes", "events", "rosters", "news"}
+            normalized = {"events", "federations", "clubs", "news", "results"}
 
         results: list[SearchResult] = []
-        if "athletes" in normalized:
-            results.extend(await self._search_athletes(query))
         if "events" in normalized:
             results.extend(await self._search_events(query))
-        if "rosters" in normalized:
-            results.extend(await self._search_rosters(query))
+        if "federations" in normalized:
+            results.extend(await self._search_federations(query))
+        if "clubs" in normalized:
+            results.extend(await self._search_clubs(query))
         if "news" in normalized:
-            results.extend(await self._search_news(query, tier))
+            results.extend(await self._search_news(query))
+        if "results" in normalized:
+            results.extend(await self._search_results(query))
 
         return SearchResponse(query=query, results=results)
-
-    async def _search_athletes(self, query: str) -> list[SearchResult]:
-        stmt = (
-            select(User)
-            .where(User.role == "athlete")
-            .where(
-                or_(
-                    User.full_name.ilike(f"%{query}%"),
-                    User.email.ilike(f"%{query}%"),
-                )
-            )
-            .limit(10)
-        )
-        result = await self._session.execute(stmt)
-        athletes = result.scalars().all()
-        return [
-            SearchResult(
-                category="Athletes",
-                title=athlete.full_name,
-                subtitle=athlete.email,
-                detail=athlete.subscription_tier.value,
-            )
-            for athlete in athletes
-        ]
 
     async def _search_events(self, query: str) -> list[SearchResult]:
         stmt = (
@@ -83,7 +61,30 @@ class SearchService:
             for event in events
         ]
 
-    async def _search_rosters(self, query: str) -> list[SearchResult]:
+    async def _search_federations(self, query: str) -> list[SearchResult]:
+        stmt = (
+            select(Federation)
+            .where(
+                or_(
+                    Federation.name.ilike(f"%{query}%"),
+                    Federation.country.ilike(f"%{query}%"),
+                )
+            )
+            .limit(10)
+        )
+        result = await self._session.execute(stmt)
+        federations = result.scalars().all()
+        return [
+            SearchResult(
+                category="Federations",
+                title=federation.name,
+                subtitle=federation.country,
+                detail=federation.website,
+            )
+            for federation in federations
+        ]
+
+    async def _search_clubs(self, query: str) -> list[SearchResult]:
         stmt = (
             select(Roster)
             .where(
@@ -99,7 +100,7 @@ class SearchService:
         rosters = result.scalars().all()
         return [
             SearchResult(
-                category="Rosters",
+                category="Clubs",
                 title=roster.name,
                 subtitle=f"{roster.country} · {roster.division}",
                 detail=f"{roster.athlete_count} athletes",
@@ -107,15 +108,9 @@ class SearchService:
             for roster in rosters
         ]
 
-    async def _search_news(self, query: str, tier: SubscriptionTier) -> list[SearchResult]:
-        audiences = [NewsAudience.PUBLIC]
-        if tier.meets(SubscriptionTier.PREMIUM):
-            audiences.append(NewsAudience.PREMIUM)
-        if tier.meets(SubscriptionTier.COACH):
-            audiences.append(NewsAudience.COACH)
+    async def _search_news(self, query: str) -> list[SearchResult]:
         stmt = (
             select(NewsArticle)
-            .where(NewsArticle.audience.in_(audiences))
             .where(
                 or_(
                     NewsArticle.title.ilike(f"%{query}%"),
@@ -135,6 +130,19 @@ class SearchService:
                 detail=article.published_at.date().isoformat(),
             )
             for article in articles
+        ]
+
+    async def _search_results(self, query: str) -> list[SearchResult]:
+        service = ResultsService(self._session)
+        summaries: list[ResultSummary] = await service.search(query)
+        return [
+            SearchResult(
+                category="Results",
+                title=f"{summary.athlete_name} · {summary.result or 'Pending'}",
+                subtitle=f"{summary.event_name} — {summary.discipline_name}",
+                detail=summary.event_location,
+            )
+            for summary in summaries
         ]
 
 

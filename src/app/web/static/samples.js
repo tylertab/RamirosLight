@@ -73,6 +73,27 @@ export const sampleRosters = [
   },
 ];
 
+export const sampleFederations = [
+  {
+    id: 1,
+    name: "Confederación Atlética Andina",
+    country: "Ecuador",
+    website: "https://anda-athletics.example.com",
+  },
+  {
+    id: 2,
+    name: "Federação Paulista de Atletismo",
+    country: "Brazil",
+    website: "https://fpa.example.br",
+  },
+  {
+    id: 3,
+    name: "Federación Atlética Metropolitana",
+    country: "Argentina",
+    website: "https://fam.example.ar",
+  },
+];
+
 export const sampleNews = [
   {
     title: "Camila Torres sets new 400m South American record",
@@ -94,6 +115,51 @@ export const sampleNews = [
     published_at: "2024-08-05T16:15:00Z",
     excerpt:
       "Coaches gain access to workload dashboards via the Trackeo Coach tier.",
+  },
+];
+
+export const sampleResults = [
+  {
+    entry_id: 1,
+    event_id: 1,
+    event_name: "Aurora Indoor Classic",
+    event_location: "Oslo, Norway",
+    discipline_id: 1,
+    discipline_name: "Women's 100m",
+    discipline_round: "Final",
+    athlete_name: "Valentina Ríos",
+    team_name: "Andean Flyers",
+    position: 1,
+    result: "11.32s",
+    updated_at: "2024-08-13T20:10:00Z",
+  },
+  {
+    entry_id: 2,
+    event_id: 1,
+    event_name: "Aurora Indoor Classic",
+    event_location: "Oslo, Norway",
+    discipline_id: 2,
+    discipline_name: "Men's Long Jump",
+    discipline_round: "Final",
+    athlete_name: "Daniel Torres",
+    team_name: "Granada Hurdlers",
+    position: 1,
+    result: "7.88m",
+    updated_at: "2024-08-13T19:55:00Z",
+  },
+  {
+    entry_id: 3,
+    event_id: 2,
+    event_name: "Sunset Coast Invitational",
+    event_location: "Porto, Portugal",
+    discipline_id: 3,
+    discipline_name: "Mixed 4x400m",
+    discipline_round: "Final",
+    athlete_name: "São Paulo Relays",
+    team_name: null,
+    position: 1,
+    result: "3:15.40",
+    updated_at: "2024-08-12T22:30:00Z",
   },
 ];
 

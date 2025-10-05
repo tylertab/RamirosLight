@@ -41,13 +41,13 @@
   <section class="search-hub" id="search">
     <div class="search-header">
       <h2 data-l10n-key="search.title">Search Trackeo's universe</h2>
-      <p data-l10n-key="search.subtitle">Find athletes, events, rosters, and bilingual news in one place.</p>
+      <p data-l10n-key="search.subtitle">Find events, federations, clubs, results, and bilingual news in one place.</p>
     </div>
     <div class="search-bar">
       <input
         id="global-search"
         type="search"
-        placeholder="Search for an athlete, club, or meet"
+        placeholder="Search for a meet, federation, club, or result"
         aria-label="Search Trackeo"
         data-l10n-placeholder="search.placeholder"
         data-l10n-aria-label="search.aria"
@@ -55,10 +55,11 @@
     </div>
     <div class="search-filters" role="tablist" aria-label="Search categories" data-l10n-aria-label="search.filters">
       <button class="search-filter active" type="button" role="tab" aria-selected="true" data-filter="all" data-l10n-key="search.filter_all">All</button>
-      <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="athletes" data-l10n-key="search.filter_athletes">Athletes</button>
       <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="events" data-l10n-key="search.filter_events">Events</button>
-      <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="rosters" data-l10n-key="search.filter_rosters">Rosters</button>
+      <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="federations" data-l10n-key="search.filter_federations">Federations</button>
+      <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="clubs" data-l10n-key="search.filter_clubs">Clubs</button>
       <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="news" data-l10n-key="search.filter_news">News</button>
+      <button class="search-filter" type="button" role="tab" aria-selected="false" data-filter="results" data-l10n-key="search.filter_results">Results</button>
     </div>
     <div class="search-results-shell">
       <p id="search-empty" class="search-empty" data-l10n-key="search.empty">Start typing to explore Trackeo's data universe.</p>
@@ -169,6 +170,22 @@
       </div>
 
       <ul id="rosters-list" class="card-list" aria-live="polite"></ul>
+    </section>
+
+    <section class="panel" aria-labelledby="results-title">
+      <div class="panel-header">
+        <div>
+          <h2 id="results-title" data-l10n-key="home.results_title">Results</h2>
+          <p class="panel-subtitle" data-l10n-key="home.results_subtitle">See verified marks as federations sync live scoreboards.</p>
+        </div>
+      </div>
+
+      <div id="results-empty" class="empty-state" hidden>
+        <p data-l10n-key="home.results_empty">No results have been published yet.</p>
+        <p class="hint" data-l10n-key="home.results_hint">Upload a schedule or generate demo entries to populate scoreboards.</p>
+      </div>
+
+      <ul id="results-list" class="card-list" aria-live="polite"></ul>
     </section>
 
     <section class="panel" aria-labelledby="news-title">

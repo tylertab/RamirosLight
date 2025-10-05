@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from app.core.config import SettingsSingleton
 from app.core.database import DatabaseSessionManager
-from app.models import Event, NewsArticle, NewsAudience, Roster, User
+from app.models import Event, Federation, NewsArticle, NewsAudience, Roster, User
 from app.schemas.event import EventCreate, EventFakeTimelineRequest
 from app.schemas.user import UserCreate
 from app.services.accounts import AccountsService
@@ -84,6 +84,24 @@ SAMPLE_ROSTERS: list[dict[str, object]] = [
         "coach_name": "Lucía Fernández",
         "athlete_count": 22,
         "owner_email": "liam.oconnor@example.com",
+    },
+]
+
+SAMPLE_FEDERATIONS: list[dict[str, object]] = [
+    {
+        "name": "Confederación Atlética Andina",
+        "country": "Ecuador",
+        "website": "https://anda-athletics.example.com",
+    },
+    {
+        "name": "Federação Paulista de Atletismo",
+        "country": "Brazil",
+        "website": "https://fpa.example.br",
+    },
+    {
+        "name": "Federación Atlética Metropolitana",
+        "country": "Argentina",
+        "website": "https://fam.example.ar",
     },
 ]
 
@@ -184,6 +202,17 @@ async def seed_initial_data() -> None:
                         include_results=True,
                     ),
                 )
+
+        federations_added = False
+        for sample in SAMPLE_FEDERATIONS:
+            exists = await session.execute(
+                select(Federation.id).where(Federation.name == sample["name"])
+            )
+            if exists.scalar_one_or_none() is not None:
+                continue
+            federation = Federation(**sample)
+            session.add(federation)
+            federations_added = True
 
         news_added = False
         for sample in SAMPLE_NEWS:

@@ -6,7 +6,9 @@ import {
   hydrateHomeState,
   setAthletes,
   setEvents,
+  setFederations,
   setRosters,
+  setResults,
   setNews,
 } from "./state.js";
 import { translations } from "./translations.js";
@@ -22,6 +24,8 @@ export function initializeHomePage({ initialData, notify }) {
   const seedEventsButton = document.querySelector("#seed-events");
   const rostersList = document.querySelector("#rosters-list");
   const rostersEmpty = document.querySelector("#rosters-empty");
+  const resultsList = document.querySelector("#results-list");
+  const resultsEmpty = document.querySelector("#results-empty");
   const newsList = document.querySelector("#news-list");
   const newsEmpty = document.querySelector("#news-empty");
   const searchInput = document.querySelector("#global-search");
@@ -125,6 +129,34 @@ export function initializeHomePage({ initialData, notify }) {
     });
   }
 
+  function renderResults() {
+    if (!resultsList || !resultsEmpty) {
+      return;
+    }
+    resultsList.innerHTML = "";
+    if (!state.results.length) {
+      resultsEmpty.hidden = false;
+      return;
+    }
+    resultsEmpty.hidden = true;
+    state.results.forEach((result) => {
+      const item = document.createElement("li");
+      item.className = "card";
+      const updated = result.updated_at ? formatDate(result.updated_at) : "";
+      const roundLabel = result.discipline_round ? ` · ${result.discipline_round}` : "";
+      item.innerHTML = `
+        <div class="card-meta">
+          <span class="tag">${result.event_name}</span>
+          ${result.event_location ? `<span>${result.event_location}</span>` : ""}
+          ${updated ? `<span>${updated}</span>` : ""}
+        </div>
+        <h3>${result.athlete_name} · ${result.result ?? "Pending"}</h3>
+        <p>${result.discipline_name}${roundLabel}</p>
+      `;
+      resultsList.appendChild(item);
+    });
+  }
+
   function renderNews() {
     if (!newsList || !newsEmpty) {
       return;
@@ -156,26 +188,6 @@ export function initializeHomePage({ initialData, notify }) {
     const results = [];
     const includeCategory = (category) => activeSearchFilter === "all" || activeSearchFilter === category;
 
-    if (includeCategory("athletes")) {
-      const athletes = (!query ? state.athletes.slice(0, 4) : state.athletes).filter((athlete) => {
-        if (!query) return true;
-        return (
-          athlete.full_name.toLowerCase().includes(query) ||
-          (athlete.email && athlete.email.toLowerCase().includes(query))
-        );
-      });
-      athletes.forEach((athlete) => {
-        const profileId = athlete.id ?? athlete.user_id ?? null;
-        results.push({
-          category: "Athletes",
-          title: athlete.full_name,
-          subtitle: athlete.email,
-          detail: athlete.role,
-          url: profileId ? `/athletes/${profileId}` : undefined,
-        });
-      });
-    }
-
     if (includeCategory("events")) {
       const events = (!query ? state.events.slice(0, 4) : state.events).filter((event) => {
         if (!query) return true;
@@ -198,7 +210,25 @@ export function initializeHomePage({ initialData, notify }) {
       });
     }
 
-    if (includeCategory("rosters")) {
+    if (includeCategory("federations")) {
+      const federations = (!query ? state.federations.slice(0, 4) : state.federations).filter((federation) => {
+        if (!query) return true;
+        return (
+          federation.name.toLowerCase().includes(query) ||
+          (federation.country && federation.country.toLowerCase().includes(query))
+        );
+      });
+      federations.forEach((federation) => {
+        results.push({
+          category: "Federations",
+          title: federation.name,
+          subtitle: federation.country,
+          detail: federation.website,
+        });
+      });
+    }
+
+    if (includeCategory("clubs")) {
       const rosters = (!query ? state.rosters.slice(0, 4) : state.rosters).filter((roster) => {
         if (!query) return true;
         return (
@@ -212,7 +242,7 @@ export function initializeHomePage({ initialData, notify }) {
         const totalAthletes = roster.athlete_count ?? roster.athletes ?? "--";
         const coachName = roster.coach_name ?? roster.coach ?? "TBA";
         results.push({
-          category: "Rosters",
+          category: "Clubs",
           title: roster.name,
           subtitle: `${roster.country} · ${roster.division ?? ""}`,
           detail: `${totalAthletes} athletes • Coach ${coachName}`,
@@ -238,6 +268,26 @@ export function initializeHomePage({ initialData, notify }) {
           subtitle: article.region,
           detail: published || article.excerpt,
           description: article.excerpt,
+        });
+      });
+    }
+
+    if (includeCategory("results")) {
+      const latestResults = (!query ? state.results.slice(0, 6) : state.results).filter((entry) => {
+        if (!query) return true;
+        return (
+          entry.athlete_name.toLowerCase().includes(query) ||
+          (entry.team_name && entry.team_name.toLowerCase().includes(query)) ||
+          entry.discipline_name.toLowerCase().includes(query) ||
+          entry.event_name.toLowerCase().includes(query)
+        );
+      });
+      latestResults.forEach((entry) => {
+        results.push({
+          category: "Results",
+          title: `${entry.athlete_name} · ${entry.result ?? "Pending"}`,
+          subtitle: `${entry.event_name} — ${entry.discipline_name}`,
+          detail: entry.event_location,
         });
       });
     }
@@ -283,6 +333,7 @@ export function initializeHomePage({ initialData, notify }) {
     renderAthletes();
     renderEvents();
     renderRosters();
+    renderResults();
     renderNews();
     renderSearchResults();
   }
@@ -472,6 +523,15 @@ export function initializeHomePage({ initialData, notify }) {
     if (!state.rosters.length && initialData?.rosters) {
       setRosters(initialData.rosters);
       renderRosters();
+      renderSearchResults();
+    }
+    if (!state.federations.length && initialData?.federations) {
+      setFederations(initialData.federations);
+      renderSearchResults();
+    }
+    if (!state.results.length && initialData?.results) {
+      setResults(initialData.results);
+      renderResults();
       renderSearchResults();
     }
     if (!state.news.length && initialData?.news) {
