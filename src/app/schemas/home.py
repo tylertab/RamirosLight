@@ -2,19 +2,60 @@
 
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 from app.schemas.event import EventDetailRead, EventRead
 from app.schemas.news import NewsRead
-from app.schemas.roster import RosterRead
-from app.schemas.user import UserRead
+
+
+class HomeClub(BaseModel):
+    """Representation of a club or roster surfaced on the home page."""
+
+    id: int | None = None
+    name: str
+    country: str | None = None
+    division: str | None = None
+    coach_name: str | None = None
+    athlete_count: int | None = None
+
+
+class HomeFederation(BaseModel):
+    """Federation and the clubs highlighted for the landing page."""
+
+    id: int
+    name: str
+    country: str | None = None
+    website: str | None = None
+    clubs: list[HomeClub] = Field(default_factory=list)
+
+
+class HomeResult(BaseModel):
+    """Recent event entry surfaced on the landing page."""
+
+    entry_id: int
+    event_id: int
+    event_name: str
+    discipline_id: int
+    discipline_name: str
+    athlete_name: str
+    team_name: str | None = None
+    position: int | None = None
+    result: str | None = None
+    points: int | None = None
+    roster_id: int | None = None
+    roster_name: str | None = None
+    federation_id: int | None = None
+    federation_name: str | None = None
+    updated_at: datetime | None = None
 
 
 class HomeSnapshot(BaseModel):
     """Bundle of data required to render the landing page."""
 
-    athletes: list[UserRead] = Field(default_factory=list)
+    federations: list[HomeFederation] = Field(default_factory=list)
     events: list[EventRead] = Field(default_factory=list)
-    rosters: list[RosterRead] = Field(default_factory=list)
+    recent_results: list[HomeResult] = Field(default_factory=list)
     news: list[NewsRead] = Field(default_factory=list)
     live_event: EventDetailRead | None = None
