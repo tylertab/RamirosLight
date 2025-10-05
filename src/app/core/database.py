@@ -40,6 +40,7 @@ class DatabaseSchemaManager:
             await conn.run_sync(self._ensure_user_subscription_columns)
             await conn.run_sync(self._ensure_federation_submission_columns)
             await conn.run_sync(self._ensure_federation_columns)
+            await conn.run_sync(self._ensure_roster_columns)
 
     def _ensure_user_subscription_columns(self, sync_conn) -> None:
         if sync_conn.dialect.name != "sqlite":
@@ -97,6 +98,21 @@ class DatabaseSchemaManager:
         if "ingest_token_hash" not in existing_columns:
             sync_conn.execute(
                 sa.text("ALTER TABLE federations ADD COLUMN ingest_token_hash VARCHAR(128)")
+            )
+
+    def _ensure_roster_columns(self, sync_conn) -> None:
+        if sync_conn.dialect.name != "sqlite":
+            return
+
+        inspector = sa.inspect(sync_conn)
+        if "rosters" not in inspector.get_table_names():
+            return
+
+        existing_columns = {column["name"] for column in inspector.get_columns("rosters")}
+
+        if "club_id" not in existing_columns:
+            sync_conn.execute(
+                sa.text("ALTER TABLE rosters ADD COLUMN club_id INTEGER REFERENCES clubs(id)")
             )
 
 
